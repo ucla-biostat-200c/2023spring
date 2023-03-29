@@ -7,7 +7,7 @@ title: Biostat 200C
 
 BIOSTAT 200C tentative schedule and handouts (expect frequent updates)
 
-BruinLearn: <???>
+BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ucla-biostat-200c.github.io/2023spring.github.io/master?urlpath=rstudio)
 
@@ -15,7 +15,7 @@ BruinLearn: <???>
 
 | Week | Tuesday | Thursday | Homework |  
 |:-----------|:-----------|:------------|:------------|  
-| 1 | [4/4](https://ucla-biostat-200c.github.io/2023spring/biostat200cspring2023/2023/04/04/week1-day1.html) course introduction and logistics \[[html](../slides/01-intro/intro.html)\] | 4/2 review of linear regression (ELMR 1) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c.github.io/2023spring/master/slides/02-lm/lm.Rmd), [html](../slides/02-lm/lm.html)\] | HW1 |  
+| 1 | 4/4 course introduction and logistics \[[html](../slides/01-intro/intro.html)\] | 4/6 review of linear regression (ELMR 1) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c.github.io/2023spring/master/slides/02-lm/lm.Rmd), [html](../slides/02-lm/lm.html)\] | HW1 |  
 | 2 | 4/7 binary response (ELMR 2) | 4/9 | |  
 | 3 | 4/14 binomial response (ELMR 3) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/04-binomial/binomial.Rmd), [html](../slides/04-binomial/binomial.html)\]  | [4/16](https://ucla-biostat-200c-2020spring.github.io/biostat200cspring2020/2020/04/16/week3-day2.html) more on logistic reg. (ELMR 4) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/05-otherlogistic/otherlogistic.Rmd), [html](../slides/05-otherlogistic/otherlogistic.html)\] | HW2 \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/hw/hw2/hw2.Rmd), [html](../hw/hw2/hw2.html)\] |  
 | 4 | [4/21](https://ucla-biostat-200c-2020spring.github.io/biostat200cspring2020/2020/04/21/week4-day1.html) Poisson regression (ELMR 5) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/06-count/count.Rmd), [html](../slides/06-count/count.html)\] | [4/23](https://ucla-biostat-200c-2020spring.github.io/biostat200cspring2020/2020/04/23/week4-day2.html) contingency tables (ELMR 6) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/07-ctable/ctable.Rmd), [html](../slides/07-ctable/ctable.html)\] | |  

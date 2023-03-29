@@ -13,20 +13,19 @@ Generalized linear models and applications in public health.
 
 ### Lecture and Discussion
 
-???  
+School of Public Health, Room 51279
 
 ### Instructor
 
-[Dr. Jin Zhou](http://hua-zhou.github.io/)  
-Office: CHS 21-254A  
-Phone: (310)794-7835  
-Email: <huazhou@ucla.edu>  
-Office hours: Tue/Thu 4pm-5pm @ Zoom <https://ucla.zoom.us/j/176728998>  
+[Dr. Jin Zhou](https://ph.ucla.edu/about/faculty-staff-directory/jin-zhou)  
+Email: <jinjinzhou@ucla.edu>  
+Office hours: Thu 3pm-4pm @ Zoom <https://ucla.zoom.us/j/5842633983>  
 
 ### Teaching Assistant
 
-Shanpeng Li: <lishanpeng0913@ucla.edu>  
-Office hours: Mon/Wed/Fri 11am-12pm @ Zoom <https://ucla.zoom.us/j/803281764>
+Richard Williams <rlwilliams34@g.ucla.edu>
+
+Office hours: ???
 
 ### Course Topics
 
