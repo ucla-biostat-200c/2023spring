@@ -1,5 +1,5 @@
 ---
-title: "Course Introduction"
+title: "Introduction"
 author: "Dr. Jin Zhou @ UCLA"
 date: "Apr 4, 2023"
 output:
@@ -12,22 +12,19 @@ subtitle: Biostat 200C
 
 ## What's this course about?
 
-- In 200B, we learn the linear models in the form
-$$
-y = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p + \epsilon, 
-$$
-where  
-  1. $y$ is a continuous _response variable_ (or _dependent variable_),  
-  2. $x_1, \ldots, x_p$ are _covariates_ (or _predictors_, or _independent variables_), and  
-  3. $\epsilon$ is the _error term_ and assumed to be normally distributed and independent among observations.    
-  
-- In 200C, we generalize the linear models in three directions.  
-  1. **Generalized linear models (GLMs)** handles nonnormal responses, $y$, such as binary response (disease or not), proportions, or counts.  
-  2. **Mixed effects models** relaxes the independence assumption of the error term and allows correlation structure in $\epsilon$.  
-  3. **Nonparametric regression models** (GAM, trees, neural networks) allow nonlinearity in the effects of predictors $x$ on responses. 
+-   In 200B, we learn the linear models in the form $$
+    y = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p + \epsilon, 
+    $$ where
+    1.  $y$ is a continuous *response variable* (or *dependent variable*),\
+    2.  $x_1, \ldots, x_p$ are *covariates* (or *predictors*, or *independent variables*), and\
+    3.  $\epsilon$ is the *error term* and assumed to be normally distributed and independent among observations.
+-   In 200C, we generalize the linear models in three directions.
+    1.  **Generalized linear models (GLMs)** handles nonnormal responses, $y$, such as binary response (disease or not), proportions, or counts.\
+    2.  **Mixed effects models** relaxes the independence assumption of the error term and allows correlation structure in $\epsilon$.\
+    3.  **Nonparametric regression models** (GAM, trees, neural networks) allow nonlinearity in the effects of predictors $x$ on responses.
 
-## Course desciption
+## Course description
 
-- Read [syllabus](https://ucla-biostat-200c.github.io/2023spring/syllabus/syllabus.html) and [schedule](https://ucla-biostat-200c.github.io/2023spring/schedule/schedule.html) for a tentative list of topics and course logistics.
+-   Read [syllabus](https://ucla-biostat-200c.github.io/2023spring/syllabus/syllabus.html) and [schedule](https://ucla-biostat-200c.github.io/2023spring/schedule/schedule.html) for a tentative list of topics and course logistics.
 
-- Teaching philosophy. Usually a GLM course is taught on blackboard/whiteboard with mostly math derivations. In this course, I will start from R code and then explain the theory behind it. 
+-   Teaching philosophy. Usually a GLM course is taught on blackboard/whiteboard with mostly math derivations. In this course, I will start from R code and then explain the theory behind it.
