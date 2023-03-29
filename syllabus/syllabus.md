@@ -3,7 +3,7 @@ layout: course
 title: Methods in Biostatistics C (Biostat 200C)
 ---
 
-# 2023 Spring Syllabus
+# Syllabus - 2023 Spring
 
 ### Course Description
 
@@ -41,7 +41,7 @@ This is a tentative list of topics:
 
 ### Prerequisite
 
-The prerequisite for this course is linear algebra (Biostat 200A, 200B and linear algebra at level of [BIOSTAT 216](https://ucla-biostat216-2019fall.github.io/schedule.html)). Those wishing to enroll without these prerequisites will need to obtain consent from the instructor.  Homework will use the statistical programming computing language [R](https://www.r-project.org).  
+The prerequisite for this course is linear algebra (Biostat 200A, 200B and linear algebra at level of [BIOSTAT 216](https://ucla-biostat-216.github.io/2022fall/syllabus/syllabus.html)). Those wishing to enroll without these prerequisites will need to obtain consent from the instructor.  Homework will use the statistical programming computing language [R](https://www.r-project.org).  
 
 ### Course Webpage
 
@@ -55,7 +55,7 @@ The prerequisite for this course is linear algebra (Biostat 200A, 200B and linea
 
 Required book (freely available via UCLA library):  
 
-* Julian Faraway, _Extending the Linear Model with R_, 2nd Edition, CRC Press (2016), [UCLA library link](https://catalog.library.ucla.edu/vwebv/holdingsInfo?searchId=1577&recCount=50&recPointer=2&bibId=8877916) 
+* Julian Faraway, _Extending the Linear Model with R_, 2nd Edition, CRC Press (2016), [UCLA library link](https://search.library.ucla.edu/permalink/01UCS_LAL/17p22dp/alma9980140713606533) 
 
 Following book is recommended but not required: 
 
@@ -63,7 +63,7 @@ Following book is recommended but not required:
 
 ### Attendance
 
-I usually require class attendence. Given the COVID-19 pandemic, I understand students may not be able to attend certain lectures due to medical or technical reasons. Please proactively communicate with the instructor and TA and notify us your circumstances at earliest chance. 
+Class attendance is required. Please proactively communicate with the instructor and TA and notify us if you cannot attend the lecture. 
 
 ### Homework
 
@@ -71,11 +71,11 @@ You will be required to work on 7-8 homework assignments throughout the quarter.
 
 ### Exam
 
-There is a midterm exam (time TBD) and a final exam .
+There is a midterm exam (time TBD) and a final exam.
 
 ### Final Grade
 
-Grades will be based on homework (30%), midterm (30%), final exam (30%), and class participation (lecture/office hour attendence and questions) (10%). 
+Grades will be based on homework (30%), midterm (30%), final exam (30%), and class participation (lecture/office hour attendance and questions) (10%). 
 
 ### UCLA ADA Policy 
 
