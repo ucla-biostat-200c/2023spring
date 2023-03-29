@@ -1,5 +1,5 @@
 ---
-title: "Review of Linear Regression (ELMR Ch1)"
+title: "Review of Linear Regression (ELMR Chapter 1)"
 author: "Dr. Jin Zhou @ UCLA"
 date: "Apr 6, 2023"
 output:
