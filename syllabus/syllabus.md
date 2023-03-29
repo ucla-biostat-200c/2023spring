@@ -47,7 +47,11 @@ The prerequisite for this course is linear algebra (Biostat 200A, 200B and linea
 
 ### Course Webpage
 
-<https://ucla-biostat-200c-2020spring.github.io>
+<https://ucla-biostat-200c.github.io/2023spring/>
+
+### Burinlearn
+
+<https://bruinlearn.ucla.edu/courses/160230>
 
 ### Course Materials
 
