@@ -16,7 +16,7 @@ BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 | Week | Tuesday | Thursday | Homework |  
 |:-----------|:----------------------|:------------------------|:------------|  
 | 1 |4/4/23 [course introduction and logistics](../slides/01-intro/intro.html) | 4/6/23 [review of linear regression (ELMR 1)](../slides/02-lm/lm.html)  | HW1 |  
-| 2 | 4/11/23 binary response (ELMR 2) | 4/13/23 | |  
+| 2 | 4/11/23 [binary response (ELMR 2)](../slides/03-binary/binary.html) | 4/13/23 | |  
 | 3 | 4/18/23 binary response (ELMR 2) | 4/20/23 | |  
 | 4 | 4/25/23 binary response (ELMR 2) | 4/27/23 | |  
 | 5 | 5/2/23 binary response (ELMR 2) | 5/4/23 | |  
