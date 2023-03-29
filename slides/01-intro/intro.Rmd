@@ -1,7 +1,7 @@
 ---
 title: "Course Introduction"
-author: "Dr. Hua Zhou @ UCLA"
-date: "Mar 31, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 4, 2023"
 output:
   # ioslides_presentation: default
   html_document:
@@ -12,7 +12,7 @@ subtitle: Biostat 200C
 
 ## What's this course about?
 
-- In 200B, we learnt the linear models in the form
+- In 200B, we learn the linear models in the form
 $$
 y = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p + \epsilon, 
 $$
@@ -28,6 +28,6 @@ where
 
 ## Course desciption
 
-- Read [syllabus](https://ucla-biostat-200c-2020spring.github.io/syllabus/syllabus.html) and [schedule](https://ucla-biostat-200c-2020spring.github.io/schedule/schedule.html) for a tentative list of topics and course logistics.
+- Read [syllabus](https://ucla-biostat-200c.github.io/2023spring/syllabus/syllabus.html) and [schedule](https://ucla-biostat-200c.github.io/2023spring/schedule/schedule.html) for a tentative list of topics and course logistics.
 
 - Teaching philosophy. Usually a GLM course is taught on blackboard/whiteboard with mostly math derivations. In this course, I will start from R code and then explain the theory behind it. 

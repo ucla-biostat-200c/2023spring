@@ -1,7 +1,7 @@
 ---
 title: "Review of Linear Regression (ELMR Chapter 1)"
-author: "Dr. Hua Zhou @ UCLA"
-date: "Mar 31, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 6, 2023"
 output:
   # ioslides_presentation: default
   html_document:
@@ -105,7 +105,7 @@ for (var in c("equip", "econ", "usage", "atlanta")) {
 }
 ```
 
-- Pairwise scatter plots are useful to explore the relationships between several continuous variables. We use the `ggpairs` function from `GGally` package.
+- Pairwise scatter plots are useful to explore the relationships between several continuous variables. We use the `ggpairs` function from [`GGally`](https://ggobi.github.io/ggally/) package ([`GGally` examples](http://www.sthda.com/english/wiki/ggally-r-package-extension-to-ggplot2-for-correlation-matrix-and-survival-plots-r-software-and-data-visualization)).
 ```{r}
 library(GGally)
 ggpairs(data = gavote, columns = c(4, 13, 14, 12)) + 
@@ -222,7 +222,7 @@ sqrt(deviance(lmod) / df.residual(lmod))
 lmodsum$sigma
 ```
 
-- A commonly used goodness of fit mesure is **$R^2$**, or **coefficient of determination** or **percentage of variance explained**
+- A commonly used goodness of fit measure is **$R^2$**, or **coefficient of determination** or **percentage of variance explained**
 $$
 R^2 = 1 - \frac{\sum_i (y_i - \widehat{y}_i)^2}{\sum_i (y_i - \bar{y})^2} = 1 - \frac{\text{RSS}}{\text{TSS}},
 $$
