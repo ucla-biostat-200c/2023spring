@@ -80,7 +80,13 @@ Grades will be based on homework (30%), midterm (30%), final exam (30%), and cla
 ### [Course Schedule](../schedule/schedule.html)
 
 
+
+
+<br>
+
+<hr>
 ### UCLA ADA Policy 
+
 
 Students needing academic accommodation based on a disability should contact the Center for Accessible Education (CAE) at (310)825-1501 or in person at Murphy Hall A255. When possible, students should contact the CAE within the first two weeks of the term as reasonable notice is needed to coordinate accommodations. For more information visit <https://www.cae.ucla.edu>.
 
