@@ -17,13 +17,13 @@ School of Public Health, Room 51279
 
 [Dr. Jin Zhou](https://ph.ucla.edu/about/faculty-staff-directory/jin-zhou)  
 Email: <jinjinzhou@ucla.edu>  
-Office hours: Thu 3pm-4pm @ Zoom <https://ucla.zoom.us/j/5842633983>  
+Office hours: Wed 2pm-3pm @ Zoom <https://ucla.zoom.us/j/5842633983>  
 
 ### Teaching Assistant
 
 Richard Williams <rlwilliams34@g.ucla.edu>
 
-Office hours: ???
+Office hours: Thu 2:30-4:30
 
 ### Course Topics
 

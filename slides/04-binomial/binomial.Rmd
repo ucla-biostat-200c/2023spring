@@ -1,7 +1,7 @@
 ---
 title: "Binomial Response (ELMR Chapter 3)"
-author: "Dr. Hua Zhou @ UCLA"
-date: "Apr 14, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 13, 2023"
 output:
   # ioslides_presentation: default
   html_document:
