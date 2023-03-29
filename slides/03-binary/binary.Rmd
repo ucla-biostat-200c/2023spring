@@ -1,7 +1,7 @@
 ---
 title: "Binary Response (ELMR Chapter 2)"
-author: "Dr. Hua Zhou @ UCLA"
-date: "Apr 7, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 11, 2023"
 output:
   # ioslides_presentation: default
   html_document:
