@@ -17,14 +17,14 @@ BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 |:-----------|:----------------------|:------------------------|:------------|  
 | 1 |4/4/23 [course introduction and logistics](../slides/01-intro/intro.html) | 4/6/23 [review of linear regression (ELMR Ch1)](../slides/02-lm/lm.html)  | HW1 |  
 | 2 | 4/11/23 [binary response (ELMR Ch2)](../slides/03-binary/binary.html) | 4/13/23 [binomial response (ELMR Ch3)](../slides/04-binomial/binomial.html)| |  
-| 3 | 4/18/23  | 4/20/23 | |  
-| 4 | 4/25/23  | 4/27/23 | |  
-| 5 | 5/2/23   | 5/4/23 | |  
-| 6 | 5/9/23   | 5/11/23 | |  
-| 7 | 5/16/23  | 5/18/23 | | 
-| 8 | 5/23/23  | 5/25/23 | |
-| 9 | 5/30/23  | 6/1/23 | | 
-| 10 | 6/6/23  | 6/8/23 | | 
+| 3 | 4/18/23 more on logistic reg. (ELMR Ch4) | 4/20/23 Poisson regression (ELMR Ch5) |HW2 |  
+| 4 | 4/25/23 multinomial data (ELMR Ch7)  | 4/27/23 GLM (ELMR Ch8) | HW3|  
+| 5 | 5/2/23  mixed models (ELMR Ch10) | 5/4/23 longitudinal data (ELMR Ch11)  | |  
+| 6 | 5/9/23  survival outcome (DB Ch10) | 5/11/23  survival outcome (DB Ch10) |HW4 |  
+| 7 | 5/16/23 midterm | 5/18/23 | GLMM (ELMR Ch13)| 
+| 8 | 5/23/23 midterm review | 5/25/23 nonparametric regression (ELMR Ch14) | HW5|
+| 9 | 5/30/23 GAM (ELMR Ch15) | 6/1/23 |Tree (ELMR Ch6) | 
+| 10 | 6/6/23  | 6/8/23 |HW6 | 
 
 <!--
 | 3 | 4/14 binomial response (ELMR 3) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/04-binomial/binomial.Rmd), [html](../slides/04-binomial/binomial.html)\]  | [4/16](https://ucla-biostat-200c-2020spring.github.io/biostat200cspring2020/2020/04/16/week3-day2.html) more on logistic reg. (ELMR 4) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/05-otherlogistic/otherlogistic.Rmd), [html](../slides/05-otherlogistic/otherlogistic.html)\] | HW2 \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/hw/hw2/hw2.Rmd), [html](../hw/hw2/hw2.html)\] |  
