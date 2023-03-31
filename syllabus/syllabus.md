@@ -23,7 +23,9 @@ Office hours: Wed 2:30pm-3:30pm @ Zoom <https://ucla.zoom.us/j/5842633983>
 
 Richard Williams <rlwilliams34@g.ucla.edu>
 
-Office hours: Thu 2:30-4:30
+Office hours: Thu 2:30 - 3:20 PM and 3:30 - 4:20 PM
+
+Location: CHS Room A1-241 (the computer lab room in the basement)
 
 ### Course Topics
 
