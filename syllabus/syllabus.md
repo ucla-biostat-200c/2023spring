@@ -73,7 +73,7 @@ Class attendance is required. Please proactively communicate with the instructor
 
 ### Homework
 
-You will be required to work on 7-8 homework assignments throughout the quarter.  
+You will be required to work on 6-7 homework assignments throughout the quarter.  
 
 ### Exam
 

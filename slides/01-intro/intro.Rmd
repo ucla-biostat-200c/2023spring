@@ -19,8 +19,13 @@ subtitle: Biostat 200C
     2.  $x_1, \ldots, x_p$ are *covariates* (or *predictors*, or *independent variables*), and\
     3.  $\epsilon$ is the *error term* and assumed to be normally distributed and independent among observations.
 -   In 200C, we generalize the linear models in three directions.
-    1.  **Generalized linear models (GLMs)** handles nonnormal responses, $y$, such as binary response (disease or not), proportions, or counts.\
+    1.  **Generalized linear models (GLMs)** handles nonnormal responses, $y$. \
+        * binary response (disease or not)
+        * proportions
+        * counts
     2.  **Mixed effects models** relaxes the independence assumption of the error term and allows correlation structure in $\epsilon$.\
+        * Some data has a grouped, nested or hierarchical structure. 
+        * Repeated measures, longitudinal and multilevel data 
     3.  **Nonparametric regression models** (GAM, trees, neural networks) allow nonlinearity in the effects of predictors $x$ on responses.
 
 ## Course description

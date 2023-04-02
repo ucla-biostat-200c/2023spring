@@ -11,6 +11,7 @@ subtitle: Biostat 200C
 ---
 
 ```{r setup, include=FALSE}
+rm(list = ls())
 knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
 ```
 
@@ -96,11 +97,15 @@ for (var in c("equip", "econ", "usage", "atlanta")) {
 ```
 
 - For qualitative predictors, we can also do side-by-side box plots to reveal potential relationship with responses. 
+  + What does  boxplot show us? 
+  + Any other plots do you usually use beside boxplot? 
+    * Violin plot
 
 ```{r}
 for (var in c("equip", "econ", "usage", "atlanta")) {
   plot <- ggplot(data = gavote) + 
-    geom_boxplot(mapping = aes(x = get(var), y = undercount))
+    geom_boxplot(mapping = aes(x = get(var), y = undercount)) + 
+    xlab(var)
   print(plot)
 }
 ```
@@ -259,6 +264,7 @@ gavote <- gavote %>%
 lmodi <- lm(undercount ~ cperAA + cpergore * usage + equip, gavote)
 summary(lmodi)
 ```
+
 The `gtsummary` package offers a more sensible diplay of regression results.
 ```{r}
 library(gtsummary)

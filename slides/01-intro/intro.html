@@ -385,12 +385,20 @@ observations.</li>
 <li>In 200C, we generalize the linear models in three directions.
 <ol style="list-style-type: decimal">
 <li><strong>Generalized linear models (GLMs)</strong> handles nonnormal
-responses, <span class="math inline">\(y\)</span>, such as binary
-response (disease or not), proportions, or counts.<br />
-</li>
+responses, <span class="math inline">\(y\)</span>.<br />
+
+<ul>
+<li>binary response (disease or not)</li>
+<li>proportions</li>
+<li>counts</li>
+</ul></li>
 <li><strong>Mixed effects models</strong> relaxes the independence
 assumption of the error term and allows correlation structure in <span class="math inline">\(\epsilon\)</span>.<br />
-</li>
+
+<ul>
+<li>Some data has a grouped, nested or hierarchical structure.</li>
+<li>Repeated measures, longitudinal and multilevel data</li>
+</ul></li>
 <li><strong>Nonparametric regression models</strong> (GAM, trees, neural
 networks) allow nonlinearity in the effects of predictors <span class="math inline">\(x\)</span> on responses.</li>
 </ol></li>
