@@ -10,6 +10,18 @@ output:
 subtitle: Biostat 200C
 ---
 
+## Course webpages
+
+- Github site: <https://ucla-biostat-200c.github.io/2023spring/>
+  + slides, hw, announcements 
+
+- Burinlearn: <https://bruinlearn.ucla.edu/courses/160230>
+  + announcements and hw submissions
+
+
+
+
+
 ## What's this course about?
 
 -   In 200B, we learn the linear models in the form $$
