@@ -1,0 +1,56 @@
+---
+title: "Biostat 200C Homework 1"
+subtitle: Due Apr 12 @ 11:59PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+
+To submit homework, please submit Rmd and html files to bruinlearn by the deadline.
+
+
+## Q1. Reivew of linear models 
+### The swiss data — use Fertility as the response to practice
+- An initial data analysis that explores the numerical and graphical characteristics of the data.
+
+- Variable selection to choose the best model.
+
+- An exploration of transformations to improve the fit of the model.
+
+- Diagnostics to check the assumptions of your model.
+
+- Some predictions of future observations for interesting values of the predictors.
+
+- An interpretation of the meaning of the model by writing a scientific abstract. (<150 words)
+
+  + BACKGROUND: brief intro of the study background, what are the existing findings
+  
+  + OBJECTIVE: state the overall purpose of your research, e.g., what kind of knowledge gap you are trying to fill in
+  
+  + METHODS: study design (how these data were collected), outcome definitions, statistical procedures used
+  
+  + RESULTS: summary of major findings to address the question raised in objective
+  
+  + CONCLUSIONS:
+
+
+## Q2. Concavity of logistic regression log-likelihood 
+
+### Q2.1
+
+Write down the log-likelihood function of logistic regresion for binomial responses.
+
+### Q2.2
+
+Derive the gradient vector and Hessian matrix of the log-likelhood function with respect to the regression coefficients $\boldsymbol{\beta}$. 
+
+### Q2.3
+
+Show that the log-likelihood function of logistic regression is a concave function in regression coefficients $\boldsymbol{\beta}$. (Hint: show that the negative Hessian is a positive semidefinite matrix.)
+
+## Q3. 
