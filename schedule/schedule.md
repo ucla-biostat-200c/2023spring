@@ -9,7 +9,7 @@ BIOSTAT 200C tentative schedule and handouts (expect frequent updates)
 
 BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ucla-biostat-200c.github.io/2023spring.github.io/master?urlpath=rstudio)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ucla-biostat-200c/2023spring/master?urlpath=rstudio)
 
 **ELMR** stands for the textbook _Extending the Linear Model with R_. 
 
