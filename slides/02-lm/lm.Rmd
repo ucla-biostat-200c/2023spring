@@ -499,3 +499,16 @@ pp <- predict(finalm, new = pdf)
 propAA <- gl(3, 1, 15, labels = c("low", "medium", "high"))
 xtabs(round(pp, 3) ~ propAA + equip, pdf)
 ```
+
+
+## Conclusion
+
+**BACKGROUND**: The controversy surrounding the 2000 US presidential election highlighted the potential impact of voting equipment on voting errors. However, most existing studies have focused on examining voting equipment across states, rather than within individual states, potentially leading to aggregation bias. Furthermore, social-economic status and race have not been adequately considered in previous research.
+
+**OBJECTIVE**: This study aimed to identify the factors influencing voting errors in the state of Georgia, taking into account social-economic status and race.
+
+**METHOD**: Data from the Georgia Secretary of State’s Election Administration Web site for the 2000 general election were used to calculate the percentage of unrecorded votes over the total ballots issued in each county. A linear regression analysis was performed to explore the factors contributing to undercounts.
+
+**RESULTS**: The study found that, for the 2000 general election in Georgia, the percentage of African American residents and the economic status of the county were significantly associated with undercount, while the type of voting equipment was not a significant predictor. Specifically, using the OS-PC voting equipment in counties with poor economic status was associated with 0.04 (95% CI: [insert confidence interval here]) higher undercount compared to counties with medium economic status. Additionally, for counties using OC-CC compared to LEVER equipment, an increase in the percentage of African American population was associated with a statistically significant higher undercount.
+
+**CONCLUSIONS**: In conclusion, this study reveals that social-economic status and race were the major contributors to voting errors in Georgia, while voting equipment type did not emerge as a significant predictor overall. However, our findings suggest that the use of certain types of voting equipment, such as the OS-PC and OS-CC, may lead to higher voter errors in counties with poor economic status and higher African American populations. Overall, these results underscore the importance of considering a range of factors when investigating voting errors in the US election system.
