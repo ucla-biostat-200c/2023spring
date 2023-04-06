@@ -30,6 +30,7 @@ Richard Williams <rlwilliams34@g.ucla.edu>
 Office hours: Thu 2:30 - 3:20 PM and 3:30 - 4:20 PM
 
 Join Zoom Meeting
+
 https://ucla.zoom.us/j/91206373350?pwd=dDcvWER0d0RhL3N4dXo5ckVVeVpmQT09
 
 ### Course Topics
