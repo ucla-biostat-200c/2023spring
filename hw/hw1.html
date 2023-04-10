@@ -367,7 +367,17 @@ Concavity of logistic regression log-likelihood</a>
 <li><a href="#q2.2" id="toc-q2.2">Q2.2</a></li>
 <li><a href="#q2.3" id="toc-q2.3">Q2.3</a></li>
 </ul></li>
-<li><a href="#q3." id="toc-q3.">Q3.</a></li>
+<li><a href="#q3." id="toc-q3.">Q3.</a>
+<ul>
+<li><a href="#q3.1" id="toc-q3.1">Q3.1</a></li>
+<li><a href="#q3.2" id="toc-q3.2">Q3.2</a></li>
+<li><a href="#q3.3" id="toc-q3.3">Q3.3</a></li>
+<li><a href="#q3.4" id="toc-q3.4">Q3.4</a></li>
+<li><a href="#q3.5" id="toc-q3.5">Q3.5</a></li>
+<li><a href="#q3.6" id="toc-q3.6">Q3.6</a></li>
+<li><a href="#q3.7" id="toc-q3.7">Q3.7</a></li>
+<li><a href="#q3.8" id="toc-q3.8">Q3.8</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -423,6 +433,66 @@ negative Hessian is a positive semidefinite matrix.)</p>
 </div>
 <div id="q3." class="section level2">
 <h2>Q3.</h2>
+<p>The National Institute of Diabetes and Digestive and Kidney Diseases
+conducted a study on 768 adult female Pima Indians living near Phoenix.
+The purpose of the study was to investigate factors related to diabetes.
+The data may be found in the the dataset <code>pima</code>.</p>
+<div id="q3.1" class="section level3">
+<h3>Q3.1</h3>
+<p>Create a factor version of the test results and use this to produce
+an interleaved histogram to show how the distribution of insulin differs
+between those testing positive and negative. Do you notice anything
+unbelievable about the plot?</p>
+</div>
+<div id="q3.2" class="section level3">
+<h3>Q3.2</h3>
+<p>Replace the zero values of <code>insulin</code> with the missing
+value code <code>NA</code>. Recreatethe interleaved histogram plot and
+comment on the distribution.</p>
+</div>
+<div id="q3.3" class="section level3">
+<h3>Q3.3</h3>
+<p>Replace the incredible zeroes in other variables with the missing
+value code. Fit a model with the result of the diabetes test as the
+response and all the other variables as predictors. How many
+observations were used in the model fitting? Why is this less than the
+number of observations in the data frame.</p>
+</div>
+<div id="q3.4" class="section level3">
+<h3>Q3.4</h3>
+<p>Refit the model but now without the insulin and triceps predictors.
+How many observations were used in fitting this model? Devise a test to
+compare this model with that in the previous question.</p>
+</div>
+<div id="q3.5" class="section level3">
+<h3>Q3.5</h3>
+<p>Use AIC to select a model. You will need to take account of the
+missing val- ues. Which predictors are selected? How many cases are used
+in your selected model?</p>
+</div>
+<div id="q3.6" class="section level3">
+<h3>Q3.6</h3>
+<p>Create a variable that indicates whether the case contains a missing
+value. Use this variable as a predictor of the test result. Is
+missingness associated with the test result? Refit the selected model,
+but now using as much of the data as reasonable. Explain why it is
+appropriate to do this.</p>
+</div>
+<div id="q3.7" class="section level3">
+<h3>Q3.7</h3>
+<p>Using the last fitted model of the previous question, what is the
+difference in the odds of testing positive for diabetes for a woman with
+a BMI at the first quartile compared with a woman at the third quartile,
+assuming that all other factors are held constant? Give a confidence
+interval for this difference.</p>
+</div>
+<div id="q3.8" class="section level3">
+<h3>Q3.8</h3>
+<p>Do women who test positive have higher diastolic blood pressures? Is
+the dias- tolic blood pressure significant in the regression model?
+Explain the distinction between the two questions and discuss why the
+answers are only apparently contradictory.</p>
+</div>
 </div>
 
 
