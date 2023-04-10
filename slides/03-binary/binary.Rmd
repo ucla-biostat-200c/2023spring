@@ -476,7 +476,7 @@ biglm <- glm(chd ~ age + height + weight + bmi + sdp + dbp + chol + dibep + cigs
 ```
 and then do sequential backward search using the `step` function
 ```{r}
-step(biglm, trace = TRUE, direction = "both") %>%
+stats::step(biglm, trace = TRUE, direction = "both") %>%
   tbl_regression() %>%
   bold_labels()
 ```
@@ -571,4 +571,156 @@ The plot displays the cross-validation error (devience by default, we chose AUC 
 cv_lasso$lambda.min
 coef(cv_lasso, cv_lasso$lambda.min)
 ```
+
 We see that this model differs from the best model chosen by AIC by replacing the predictor `bmi` by `weight`.
+
+### Try `tidymodels`
+- Dig deeper into tidy modeling with R at <https://www.tmwr.org>
+```{r}
+library(tidymodels)
+```
+
+```{r}
+# For reproducibility
+set.seed(203)
+
+data_split <- initial_split(
+  wcgs, 
+  # stratify by chd
+  strata = "chd", 
+  prop = 0.75
+  )
+data_split
+```
+
+```{r}
+wcgs_other <- training(data_split)
+dim(wcgs)
+```
+
+```{r}
+wcgs_test <- testing(data_split)
+dim(wcgs_test)
+```
+
+- Receipt
+```{r}
+logit_recipe <- 
+  recipe(
+    chd ~  age + height + weight + bmi + sdp + dbp + chol + dibep + cigs + arcus, 
+    data = wcgs_other
+  ) %>%
+  # mean imputation for chol
+  step_impute_mean(chol) %>%
+  # mode imputation for arcus
+  step_impute_mode(arcus) %>%
+  # create traditional dummy variables
+  step_dummy(all_nominal_predictors()) %>%
+  # zero-variance filter
+  step_zv(all_numeric_predictors()) %>% 
+  # center and scale numeric data
+  step_normalize(all_numeric_predictors()) %>%
+  # estimate the means and standard deviations
+  prep(training = wcgs_other, retain = TRUE)
+logit_recipe
+```
+
+- Model
+```{r}
+logit_mod <- 
+  logistic_reg(
+    penalty = tune(), 
+    mixture = 1 # tune()
+  ) %>% 
+  set_engine("glmnet", standardize = FALSE)
+logit_mod
+```
+
+- Workflow
+```{r}
+logit_wf <- workflow() %>%
+  add_recipe(logit_recipe) %>%
+  add_model(logit_mod)
+logit_wf
+```
+
+- Tuning grid
+```{r}
+param_grid <- grid_regular(
+  penalty(range = c(-6, 3)), 
+  # mixture(),
+  levels = 100 # c(100, 5)
+  )
+param_grid
+```
+
+- Cross validation
+
+```{r}
+# Set cross-validation partitions
+set.seed(200)
+
+folds <- vfold_cv(wcgs_other, v = 5)
+folds
+```
+
+- Fit cross-validation
+```{r}
+system.time({
+logit_fit <- logit_wf %>%
+  tune_grid(
+    resamples = folds,
+    grid = param_grid,
+    metrics = metric_set(roc_auc, accuracy)
+    )
+})
+```
+
+```{r}
+logit_fit
+```
+
+```{r}
+logit_fit %>%
+  collect_metrics() %>%
+  print(width = Inf) %>%
+  filter(.metric == "roc_auc") %>%
+  ggplot(mapping = aes(x = penalty, y = mean)) +
+  geom_point() +
+  labs(x = "Penalty", y = "CV AUC") +
+  scale_x_log10()
+```
+
+```{r}
+best_logit <- logit_fit %>%
+  select_best("roc_auc")
+best_logit
+```
+
+### Finalize model
+-  Final workflow
+```{r}
+final_wf <- logit_wf %>%
+  finalize_workflow(best_logit)
+final_wf
+```
+
+```{r}
+# Fit the whole training set, then predict the test cases
+final_fit <- 
+  final_wf %>%
+  last_fit(data_split)
+final_fit
+```
+
+```{r}
+# Test metrics
+final_fit %>% 
+  collect_metrics()
+```
+
+- Selected variables' coefficients
+```{r}
+tidy(extract_model(final_fit)) %>%
+  filter(lambda > 0.001 & lambda < 0.0011)
+```
