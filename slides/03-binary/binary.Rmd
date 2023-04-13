@@ -337,7 +337,28 @@ wcgs %>%
 ```
 **Question**: is there a concern that the deviance residuals are not centered around 0? 
 
-- **Exercise**: Do similar binned plots for deviance residuals against `weights` and deviance residuals vs `cigs` to check the linearity assumption. 
+- **Exercise**: Do similar binned plots for deviance residuals against `height` and deviance residuals vs `cigs` to check the linearity assumption. 
+
+
+```{r}
+wcgs %>%
+  mutate(devres = devres) %>%
+  group_by(height) %>%
+  summarize(devres = mean(devres)) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = height, y = devres)) + 
+  labs(x = "height", y = "Binned deviance residual")
+```
+```{r}
+wcgs %>%
+  mutate(devres = devres) %>%
+  group_by(cigs) %>%
+  summarize(devres = mean(devres),
+            count = n()) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = cigs, y = devres, size=sqrt(count))) + 
+  labs(x = "cigs", y = "Binned deviance residual")
+```
 
 - QQ plot is not helpful since there is no reason these deviance residuals are approximately standard normal.
 ```{r}
@@ -476,7 +497,7 @@ biglm <- glm(chd ~ age + height + weight + bmi + sdp + dbp + chol + dibep + cigs
 ```
 and then do sequential backward search using the `step` function
 ```{r}
-stats::step(biglm, trace = TRUE, direction = "both") %>%
+stats::step(biglm, trace = TRUE, direction = "back") %>%
   tbl_regression() %>%
   bold_labels()
 ```
