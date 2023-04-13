@@ -425,7 +425,7 @@ wcgs_binned %>%
 
 - The Hosmer-Lemeshow test formalizes this idea by testing the statistic
 $$
-X_{\text{HL}}^2 = \sum_{j=1}^J \frac{(y_i - m_j \widehat{p}_j)^2}{m_j \widehat{p}_j (1 - \widehat{p}_j)}
+X_{\text{HL}}^2 = \sum_{j=1}^J \frac{(y_j - m_j \widehat{p}_j)^2}{m_j \widehat{p}_j (1 - \widehat{p}_j)}
 $$
 against the $\chi^2$ distribution with $J-1$ degrees of freedom.
 ```{r}
@@ -527,6 +527,7 @@ split data into 80% training cases and 20% validation cases.
 ```{r}
 library(glmnet)
 library(caret)
+library(themis) # provides up/down-sampling methods for the data
 
 # set seed for reproducibility
 set.seed(200)
@@ -539,6 +540,7 @@ training_samples <- wcgs$chd %>%
 # (val_data   <- wcgs %>%
 #   slice(-training_samples[, 1]))
 ```
+
 The `glmnet` package takes a matrix (of predictors) and a vector (of responses) as input. We use `model.matrix` function to create them. `glmnet` will add intercept by default, so we drop intercept term when forming `x` matrix.
 ```{r}
 # X and y from original data
@@ -609,14 +611,14 @@ data_split <- initial_split(
   wcgs, 
   # stratify by chd
   strata = "chd", 
-  prop = 0.75
-  )
+  prop = 0.75)
+
 data_split
 ```
 
 ```{r}
 wcgs_other <- training(data_split)
-dim(wcgs)
+dim(wcgs_other)
 ```
 
 ```{r}
@@ -624,7 +626,8 @@ wcgs_test <- testing(data_split)
 dim(wcgs_test)
 ```
 
-- Receipt
+
+- Receipt <https://recipes.tidymodels.org/articles/recipes.html#preprocessing-steps>
 ```{r}
 logit_recipe <- 
   recipe(

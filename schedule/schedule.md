@@ -16,7 +16,7 @@ BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 | Week | Tuesday | Thursday | Homework |  
 |:-----------|:----------------------|:------------------------|:------------|  
 | 1 |[4/4/23](https://ucla-biostat-200c.github.io/2023spring/biostat200cspring2023/2023/04/04/week1-day1.html) course introduction and logistics [html](../slides/01-intro/intro.html), [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/slides/01-intro/intro.Rmd) | [4/6/23](https://ucla-biostat-200c.github.io/2023spring/biostat200cspring2023/2023/04/06/week1-day2.html) review of linear regression (ELMR Ch1) [html](../slides/02-lm/lm.html), [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/slides/02-lm/lm.Rmd) | HW1 [html](../hw/hw1.html), [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/hw/hw1.Rmd) |  
-| 2 | [4/11/23](https://ucla-biostat-200c.github.io/2023spring/biostat200cspring2023/2023/04/11/week2-day1.html) binary response (ELMR Ch2) [html](../slides/03-binary/binary.html) | 4/13/23 binomial response (ELMR Ch3) [html](../slides/04-binomial/binomial.html)| |  
+| 2 | [4/11/23](https://ucla-biostat-200c.github.io/2023spring/biostat200cspring2023/2023/04/11/week2-day1.html) binary response (ELMR Ch2) [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/slides/03-binary/binary.Rmd) [html](../slides/03-binary/binary.html) | 4/13/23 binomial response (ELMR Ch3) [html](../slides/04-binomial/binomial.html)| |  
 | 3 | 4/18/23 more on logistic reg. (ELMR Ch4) | 4/20/23 Poisson regression (ELMR Ch5) |HW2 |  
 | 4 | 4/25/23 multinomial data (ELMR Ch7)  | 4/27/23 GLM (ELMR Ch8) | HW3|  
 | 5 | 5/2/23  mixed models (ELMR Ch10) | 5/4/23 longitudinal data (ELMR Ch11)  |HW4 |  
