@@ -1,6 +1,6 @@
 ---
 title: "Biostat 200C Homework 2"
-subtitle: Due Apr 28 @ 11:59PM
+subtitle: Due Apr  @ 11:59PM
 output: 
   html_document:
     toc: true
@@ -11,94 +11,257 @@ output:
 knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
 ```
 
-## Q1. Beta-Binomial 
+To submit homework, please upload both Rmd and html files to Bruinlearn by the deadline.
 
-Let $Y_i$ be the number of successes in $n_i$ trials with
+## Q1. CFR of COVID-19
+
+Of primary interest to public is the risk of dying from COVID-19. A commonly used measure is case fatality rate/ratio/risk (CFR), which is defined as
 $$
-Y_i \sim \text{Bin}(n_i, \pi_i),
+\frac{\text{number of deaths from disease}}{\text{number of diagnosed cases of disease}}.
 $$
-where the probabilities $\pi_i$ have a Beta distribution
-$$
-\pi \sim \text{Be}(\alpha, \beta)
-$$
-with density function
-$$
-f(x; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \quad x \in [0, 1], \alpha > 0, \beta > 0.
-$$
+Apparently CFR is not a fixed constant; it changes with time, location, and other factors. Also CFR is different from the infection fatality rate (IFR), the probability that someone infected with COVID-19 dies from it. 
 
-### Q1.1
+In this exercise, we use logistic regression to study how US county-level CFR changes according to demographic information and some health-, education-, and economy-indicators.
 
-Find the mean and variance of $\pi$.
+### Data sources
 
-### Q1.2
+- `04-04-2020.csv.gz`: The data on COVID-19 confirmed cases and deaths on 2020-04-04 is retrieved from the [Johns Hopkins COVID-19 data repository](https://github.com/CSSEGISandData/COVID-19). It was downloaded from this [link](https://github.com/CSSEGISandData/COVID-19) (commit 0174f38). This repository has been archived by the owner on Mar 10, 2023. It is now read-only. You can download data from box: <https://ucla.box.com/s/brb3vz4nwoq8pjkcutxncymqw583d39l>
 
-Find the mean and variance of $Y_i$ and show that the variance of $Y_i$ is always larger than or equal to that of a Binomial random variable with the same batch size and mean.
+- `us-county-health-rankings-2020.csv.gz`: The 2020 County Health Ranking Data was released by [County Health Rankings](https://www.countyhealthrankings.org). The data was downloaded from the [Kaggle Uncover COVID-19 Challenge](https://www.kaggle.com/roche-data-science-coalition/uncover) (version 1). You can download data from box: <https://ucla.box.com/s/brb3vz4nwoq8pjkcutxncymqw583d39l>
 
-## Q2. Motivation for quasi-binomial
+### Sample code for data preparation
 
-Verify that the log-likilihood $\ell_i$ of a binomial proportion $Y_i$, where $m_i Y_i \sim \text{Bin}(m_i, p_i)$, satisfies  
-\begin{eqnarray*}
-\mathbb{E} \frac{\partial \ell_i}{\partial \mu_i} &=& 0 \\
-\operatorname{Var} \frac{\partial \ell_i}{\partial \mu_i} &=& \frac{1}{\phi V(\mu_i)} \\
-\mathbb{E} \frac{\partial \ell_i^2}{\partial^2 \mu_i} &=& - \frac{1}{\phi V(\mu_i)},
-\end{eqnarray*}
-with $\phi = 1$, $\mu_i = p_i$, and $V(\mu_i) = p_i (1 - p_i)/m_i$. Therefore the $U_i$ in quasi-binomial method mimics the behavior of a binomial model.
+Load the `tidyverse` package for data manipulation and visualization.
+```{r}
+# tidyverse of data manipulation and visualization
+library(tidyverse)
+```
+Read in the data of COVID-19 cases reported on 2020-04-04.
+```{r}
+county_count <- read_csv("./datasets/04-04-2020.csv.gz") %>%
+  # cast fips into dbl for use as a key for joining tables
+  mutate(FIPS = as.numeric(FIPS)) %>%
+  filter(Country_Region == "US") %>%
+  print(width = Inf)
+```
+Standardize the variable names by changing them to lower case.
+```{r}
+names(county_count) <- str_to_lower(names(county_count))
+```
+Sanity check by displaying the unique US states and territories:
+```{r}
+county_count %>%
+  select(province_state) %>%
+  distinct() %>%
+  arrange(province_state) %>%
+  print(n = Inf)
+```
+We want to exclude entries from `Diamond Princess`, `Grand Princess`, `Guam`, `Northern Mariana Islands`, `Puerto Rico`, `Recovered`, and `Virgin Islands`, and only consider counties from 50 states and DC.
+```{r}
+county_count <- county_count %>%
+  filter(!(province_state %in% c("Diamond Princess", "Grand Princess", 
+                                 "Recovered", "Guam", "Northern Mariana Islands", 
+                                 "Puerto Rico", "Virgin Islands"))) %>%
+  print(width = Inf)
+```
+Graphical summarize the COVID-19 confirmed cases and deaths on 2020-04-04 by state.
+```{r}
+county_count %>%
+  # turn into long format for easy plotting
+  pivot_longer(confirmed:recovered, 
+               names_to = "case", 
+               values_to = "count") %>%
+  group_by(province_state) %>%
+  ggplot() + 
+  geom_col(mapping = aes(x = province_state, y = `count`, fill = `case`)) + 
+  # scale_y_log10() + 
+  labs(title = "US COVID-19 Situation on 2020-04-04", x = "State") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
 
-## Q3. Concavity of Poisson regression log-likelihood 
+Read in the 2020 county-level health ranking data.
+```{r}
+county_info <- read_csv("./datasets/us-county-health-rankings-2020.csv.gz") %>%
+  filter(!is.na(county)) %>%
+  # cast fips into dbl for use as a key for joining tables
+  mutate(fips = as.numeric(fips)) %>%
+  select(fips, 
+         state,
+         county,
+         percent_fair_or_poor_health, 
+         percent_smokers, 
+         percent_adults_with_obesity, 
+         # food_environment_index,
+         percent_with_access_to_exercise_opportunities, 
+         percent_excessive_drinking,
+         # teen_birth_rate, 
+         percent_uninsured,
+         # primary_care_physicians_rate,
+         # preventable_hospitalization_rate,
+         # high_school_graduation_rate,
+         percent_some_college,
+         percent_unemployed,
+         percent_children_in_poverty,
+         # `80th_percentile_income`,
+         # `20th_percentile_income`,
+         percent_single_parent_households,
+         # violent_crime_rate,
+         percent_severe_housing_problems,
+         overcrowding,
+         # life_expectancy,
+         # age_adjusted_death_rate,
+         percent_adults_with_diabetes,
+         # hiv_prevalence_rate,
+         percent_food_insecure,
+         # percent_limited_access_to_healthy_foods,
+         percent_insufficient_sleep,
+         percent_uninsured_2,
+         median_household_income,
+         average_traffic_volume_per_meter_of_major_roadways,
+         percent_homeowners,
+         # percent_severe_housing_cost_burden,
+         population_2,
+         percent_less_than_18_years_of_age,
+         percent_65_and_over,
+         percent_black,
+         percent_asian,
+         percent_hispanic,
+         percent_female,
+         percent_rural) %>%
+  print(width = Inf)
+```
 
-Let $Y_1,\ldots,Y_n$ be independent random variables with $Y_i \sim \text{Poisson}(\mu_i)$ and $\log \mu_i = \mathbf{x}_i^T \boldsymbol{\beta}$, $i = 1,\ldots,n$.
+For stability in estimating CFR, we restrict to counties with $\ge 5$ confirmed cases.
+```{r}
+county_count <- county_count %>%
+  filter(confirmed >= 5)
+```
+We join the COVID-19 count data and county-level information using FIPS (Federal Information Processing System) as key. 
+```{r}
+county_data <- county_count %>%
+  left_join(county_info, by = "fips") %>%
+  print(width = Inf)
+```
+Numerical summaries of each variable:
+```{r}
+summary(county_data)
+```
+List rows in `county_data` that don't have a match in `county_count`:
+```{r}
+county_data %>%
+  filter(is.na(state) & is.na(county)) %>%
+  print(n = Inf)
+```
+We found there are some rows that miss `fips`. 
+```{r}
+county_count %>%
+  filter(is.na(fips)) %>%
+  select(fips, admin2, province_state) %>%
+  print(n = Inf)
+```
+We need to (1) manually set the `fips` for some counties, (2) discard those `Unassigned`, `unassigned` or `Out of`, and (3) try to join with `county_info` again.
+```{r}
+county_data <- county_count %>%
+  # manually set FIPS for some counties
+  mutate(fips = ifelse(admin2 == "DeKalb" & province_state == "Tennessee", 47041, fips)) %>%
+  mutate(fips = ifelse(admin2 == "DeSoto" & province_state == "Florida", 12027, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "Dona Ana" & province_state == "New Mexico", 35013, fips)) %>% 
+  mutate(fips = ifelse(admin2 == "Dukes and Nantucket" & province_state == "Massachusetts", 25019, fips)) %>% 
+  mutate(fips = ifelse(admin2 == "Fillmore" & province_state == "Minnesota", 27045, fips)) %>%  
+  #mutate(fips = ifelse(admin2 == "Harris" & province_state == "Texas", 48201, fips)) %>%  
+  #mutate(fips = ifelse(admin2 == "Kenai Peninsula" & province_state == "Alaska", 2122, fips)) %>%  
+  mutate(fips = ifelse(admin2 == "LaSalle" & province_state == "Illinois", 17099, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "LaSalle" & province_state == "Louisiana", 22059, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "Lac qui Parle" & province_state == "Minnesota", 27073, fips)) %>%  
+  mutate(fips = ifelse(admin2 == "Manassas" & province_state == "Virginia", 51683, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "Matanuska-Susitna" & province_state == "Alaska", 2170, fips)) %>%
+  mutate(fips = ifelse(admin2 == "McDuffie" & province_state == "Georgia", 13189, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "McIntosh" & province_state == "Georgia", 13191, fips)) %>%
+  #mutate(fips = ifelse(admin2 == "McKean" & province_state == "Pennsylvania", 42083, fips)) %>%
+  mutate(fips = ifelse(admin2 == "Weber" & province_state == "Utah", 49057, fips)) %>%
+  filter(!(is.na(fips) | str_detect(admin2, "Out of") | str_detect(admin2, "Unassigned"))) %>%
+  left_join(county_info, by = "fips") %>%
+  print(width = Inf)
+```
+Summarize again
+```{r}
+summary(county_data)
+```
+If there are variables with missing value for many counties, we go back and remove those variables from consideration.
 
-### Q3.1
+Let's create a final data frame for analysis.
+```{r}
+county_data <- county_data %>%
+  mutate(state = as.factor(state)) %>%
+  select(county, confirmed, deaths, state, percent_fair_or_poor_health:percent_rural)
+summary(county_data)
+```
+Display the 10 counties with highest CFR.
+```{r}
+county_data %>%
+  mutate(cfr = deaths / confirmed) %>%
+  select(county, state, confirmed, deaths, cfr) %>%
+  arrange(desc(cfr)) %>%
+  top_n(10)
+```
+Write final data into a csv file for future use.
+```{r}
+write_csv(county_data, "./datasets/covid19-county-data-20200404.csv.gz")
+```
 
-Write down the log-likelihood function.
+### Note:
 
-### Q3.2
+Given that the datasets were collected in the middle of the pandemic, what assumptions of CFR might be violated by defining CFR as `deaths/confirmed` from this data set? 
 
-Derive the gradient vector and Hessian matrix of the log-likelhood function with respect to the regression coefficients $\boldsymbol{\beta}$. 
+Because COVID-19 pandemic was still ongoing in 2020, we should realize some critical assumptions for defining CFR are not met using this datasets.
 
-### Q3.3
+1. Numbers of confirmed cases do not reflect the number of diagnosed people. This is mainly limited by the availability of testing.
 
-Show that the log-likelihood function of the log-linear model is a concave function in regression coefficients $\boldsymbol{\beta}$. (Hint: show that the negative Hessian is a positive semidefinite matrix.)
+2. Some confirmed cases may die later.
 
-### Q3.4
+With acknowledgement of these severe limitations, we continue to use `deaths/confirmed` as a very rough proxy of CFR.
 
-Show that for the fitted values $\widehat{\mu}_i$ from maximum likelihood estimates
-$$
-\sum_i \widehat{\mu}_i = \sum_i y_i.
-$$
-Therefore the deviance reduces to
-$$
-D = 2 \sum_i y_i \log \frac{y_i}{\widehat{\mu}_i}.
-$$
+### Q1.1 
 
-## Q4. Odds ratios
+Read and run above code to generate a data frame `county_data` that includes county-level COVID-19 confirmed cases and deaths, demographic, and health related information. 
 
-Consider a $2 \times 2$ contingency table from a prospective study in which people who were or were not exposed to some pollutant are followed up and, after several years, categorized according to the presense or absence of a disease. Following table shows the probabilities for each cell. The odds of disease for either exposure group is $O_i = \pi_i / (1 - \pi_i)$, for $i = 1,2$, and so the odds ratio is
-$$
-\phi = \frac{O_1}{O_2} = \frac{\pi_1(1 - \pi_2)}{\pi_2 (1 - \pi_1)}
-$$
-is a measure of the relative likelihood of disease for the exposed and not exposed groups.
+### Q1.2 
 
-|             | Diseased | Not diseased |
-|:-----------:|----------|--------------|
-| Exposed     | $\pi_1$  | $1 - \pi_1$  |
-| Not exposed | $\pi_2$  | $1 - \pi_2$  |
+What assumptions of logistic regression may be violated by this data set?
 
-### Q4.1
+### Q1.3 
 
-For the simple logistic model
-$$
-\pi_i = \frac{e^{\beta_i}}{1 + e^{\beta_i}}, 
-$$
-show that if there is no difference between the exposed and not exposed groups (i.e., $\beta_1 = \beta_2$), then $\phi = 1$.
+Run a logistic regression, using variables `state`, ..., `percent_rural` as predictors. 
 
-### Q4.2 
+### Q1.4
 
-Consider $J$ $2 \times 2$ tables, one for each level $x_j$ of a factor, such as age group, with $j=1,\ldots, J$. For the logistic model
-$$
-\pi_{ij} = \frac{e^{\alpha_i + \beta_i x_j}}{1 + e^{\alpha_i + \beta_i x_j}}, \quad i = 1,2, \quad j= 1,\ldots, J.
-$$
-Show that $\log \phi$ is constant over all tables if $\beta_1 = \beta_2$.
+Interpret the regression coefficients of 3 significant predictors with p-value <0.01.
 
+### Q1.5 
 
+Apply analysis of deviance to (1) evaluate the goodness of fit of the model and (2) compare the model to the intercept-only model. 
+
+### Q1.6
+
+Perform analysis of deviance to evaluate the significance of each predictor. Display the 10 most significant predictors.
+
+### Q1.7
+
+Construct confidence intervals of regression coefficients.
+
+### Q1.8 
+
+Plot the deviance residuals against the fitted values. Are there potential outliers?
+
+### Q1.9
+
+Plot the half-normal plot. Are there potential outliers in predictor space?
+
+### Q1.10
+
+Find the best sub-model using the AIC criterion.
+
+### Q1.11
+
+Find the best sub-model using the lasso with cross validation.
 
