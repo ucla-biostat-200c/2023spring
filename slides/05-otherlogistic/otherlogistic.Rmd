@@ -1,0 +1,386 @@
+---
+title: "Variations on Logistic Regression (ELMR Chapter 4)"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 20, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+`faraway` package contains the datasets in the ELMR book.
+
+## Latent variables
+
+- Consider a latent variable $T$ and let
+$$
+Y = \begin{cases}
+1 & \text{if } T \le t \\
+0 & \text{if } T > t
+\end{cases}.
+$$
+Then
+$$
+p = \mathbb{P}(Y = 1) = \mathbb{P}(T \le t).
+$$
+- If $T$ follows the **logistic distribution**
+$$
+\mathbb{P}(T \le t) = \frac{e^{(t - \mu) / \sigma}}{1 + e^{(t-\mu)/\sigma}},
+$$
+then we recover the logistic regression by setting
+$$
+\frac{t-\mu}{\sigma} = \eta = \mathbf{x}^T \boldsymbol{\beta}.
+$$
+```{r}
+tibble(t = seq(-6, 6, 0.1), pdf = dlogis(t, location = 0, scale = 1)) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = t, y = pdf)) + 
+  labs(x = "t", y = "Density", title = "Logistic(0, 1) distribution")
+```
+
+
+## Link functions
+
+- The **logit link function**
+$$
+\eta = g(p) = \log \frac{p}{1-p}
+$$
+is not the only choice for Bernoulli and binomial regression. 
+
+- Any functions $g: [0, 1] \mapsto \mathbb{R}$ that is smooth and monotone qualifies as a link function. 
+
+- **Probit** link function, corresponding a normal latent variable.
+$$
+\eta = g(p) = \Phi^{-1}(p),
+$$
+where $\Phi$ is the cumulative distribution function (cdf) of a standard normal. The corresponding inverse link function is
+$$
+p = \Phi(\eta).
+$$
+
+- **Complementary log-log** link functionm, corresponding to a Gumbel-distributed latent variable. 
+$$
+\eta = g(p) = \log ( - \log(1-p)).
+$$
+The corresponding inverse link function is
+$$
+p = 1 - e^{-e^{\eta}}.
+$$
+
+- **Cauchit** link function, corresponding to a Cauchy-distributed latent variable.
+$$
+\eta = g(p) = \tan((p - 1/2) \pi).
+$$
+The corresponding inverse link function is
+$$
+p = \frac{\arctan(\eta)}{\pi} + \frac 12.
+$$
+
+## Bliss data
+
+`bliss` data records the number of insects dying at different levels of insecticide concentration.
+```{r}
+bliss
+```
+We fit `bliss` data using different link functions
+```{r}
+mlogit   <- glm(cbind(dead, alive) ~ conc, family = binomial,                 data = bliss)
+mprobit  <- glm(cbind(dead, alive) ~ conc, family = binomial(link = probit),  data = bliss)
+mcloglog <- glm(cbind(dead, alive) ~ conc, family = binomial(link = cloglog), data = bliss)
+mcauchit <- glm(cbind(dead, alive) ~ conc, family = binomial(link = cauchit), data = bliss)
+```
+and compare their deviances (equivalent to comparing their log-likelihoods)
+```{r}
+# logLik(mlogit)
+# logLik(mprobit)
+# logLik(mcloglog)
+# logLik(mcauchit)
+mlogit$deviance
+mprobit$deviance
+mcloglog$deviance
+mcauchit$deviance
+```
+Probit seems to give a better fit.
+
+- Copmaring fitted probabilities
+```{r}
+tibble(conc    = bliss$conc,
+       logit   = predict(mlogit  , type = "response"),
+       probit  = predict(mprobit , type = "response"),
+       cloglog = predict(mcloglog, type = "response"),
+       cauchit = predict(mcauchit, type = "response"))
+```
+we don't see vast difference in the predictions from 4 link functions.
+
+- Let's compare the predictions at a wider range [-4, 8]. We observe wider differences at extreme values of linear predictors. Logit and probit are very close. Cauchit approaches 0 and 1 at slower rate, while cloglog at a faster rate.
+```{r}
+df <- tibble(conc = seq(-4, 8, 0.2))
+tibble(dose    = df$conc,
+       logit   = predict(mlogit  , type = "response", newdata = df),
+       probit  = predict(mprobit , type = "response", newdata = df),
+       cloglog = predict(mcloglog, type = "response", newdata = df),
+       cauchit = predict(mcauchit, type = "response", newdata = df)) %>%
+  pivot_longer(logit:cauchit, names_to = "link", values_to = "pred") %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = dose, y = pred, color = link)) + 
+  labs(x = "Dose", y = "Predicted probability", 
+       title = "Predicions from different link functions")
+```
+
+- Logit link is the default choice because of  
+    - simpler math,    
+    - easier interpretation using odds, and  
+    - and easier analysis of retrospectively sampled data.  
+    
+## Prospective and retrospective sampling
+
+- In **prospective sampling** or **cohort study** or **follow-up study**, the predictors are fixed and then the outcome is observed. 
+
+- In **retrospective sampling** or **case-control study**, the outcome is fixed and then the predictors are observed. It is required that the probability of inclusion in the study is independent of the predictor values. 
+
+- Baby food example. We want to study the effect of sex and feeding method on whether a baby gets respiratory disease in the first year.
+```{r}
+babyfood
+xtabs(disease / (disease + nondisease) ~ sex + food, babyfood)
+```
+ 
+- Assuming prospective sampling (collect babies first then follow up whether they develop respiratory disease in the 1 year), we fit a logistic regression
+```{r}
+library(gtsummary)
+
+babyfood %>%
+  # change reference level to Breast and Girl
+  mutate(food = relevel(food, ref = "Breast"), sex = relevel(sex, ref = "Girl")) %>% 
+  glm(cbind(disease, nondisease) ~ sex + food, family = binomial, data = .) %>%
+  tbl_regression(intercept = TRUE, exponentiate = TRUE)
+```
+
+The regression coefficient 0.67 for `Bottle` respresents the increased risk of developing respiratory disease incurred by bottle feeding relative to breast feeding. Similarly the regression coefficient `0.31` represents the increased risk of boys relative to girls. 
+
+- Assuming retrospective sampling (inspect the medical history of many babies at 1 year old), it seems more sensible compute the log-odds of sex given the respiratory disease status. We actually observe the same regression coefficient `0.31` for `dis`! 
+```{r}
+babyfood %>%
+  # change reference level to Breast and Girl
+  mutate(food = relevel(food, ref = "Breast"), sex = relevel(sex, ref = "Girl")) %>%
+  pivot_longer(disease:nondisease, names_to = "dis", values_to = "count") %>%
+  mutate(dis = relevel(as.factor(dis), ref = "nondisease")) %>%
+  glm(sex ~ dis + food, family = binomial, weights = count, data = .) %>%
+  tbl_regression(intercept = TRUE, exponentiate = TRUE)
+```
+
+- We see that using logistic regression for the retrospective design is as effective as a prospective design for estimating a relative risk. Retrospective design is more convenient because   
+    1. it is easier to collect cases and controls (we don't need to wait for long time to even not able to collect any rare cases),   
+    2. is is simpler to collect many predictors.  
+
+- Prospective design has its unique advantage though. Let
+\begin{eqnarray*}
+\pi_0 &=& \text{probability of being included in the study if they do not have disease} \\
+\pi_1 &=& \text{probability of being included in the study if they do have disease}.
+\end{eqnarray*}
+In prosective studies, $\pi_0 = \pi_1$. In retrospective studies, typically $\pi_1 \gg \pi_0$. Let
+\begin{eqnarray*}
+p^\star(\mathbf{x}) &=& \text{conditional probability that an individual has the disease given that he or she was included in the study} \\
+p(\mathbf{x}) &=& \text{unconditional probability that an individual has the disease as we would obtain from a prospective study}. 
+\end{eqnarray*}
+By Bayes theorem
+$$
+p^\star(\mathbf{x}) = \frac{\pi_1 p(\mathbf{x})}{\pi_1 p(\mathbf{x}) + \pi_0 (1 - p(\mathbf{x}))},
+$$
+which after rearrangement shows
+$$
+\text{logit}(p^\star(\mathbf{x})) = \log \frac{\pi_1}{\pi_0} + \text{logit}(p(\mathbf{x})).
+$$
+In general $\pi_1/\pi_0$ is unknown, therefore we would not be able to estimate intercept $\beta_0$ in a retrospective study. However we can still estimate the relative effect, e.g., odds ratio, of non-intercept predictors. 
+
+## Prediction
+
+- Given covariate $\mathbf{x}_0$, the predicted response on the link scale is
+$$
+\widehat{\eta} = \mathbf{x}_0^T \widehat{\boldsymbol{\beta}}
+$$
+with variance
+$$
+\operatorname{Var} \widehat{\eta} = \mathbf{x}_0^T \cdot \operatorname{Var} \widehat{\boldsymbol{\beta}} \cdot \mathbf{x}_0 = \mathbf{x}_0^T \left( \mathbf{X}^T \widehat{\mathbf{W}} \mathbf{X} \right)^{-1} \mathbf{x}_0.
+$$
+- For the insecticide data `bliss`, to predict the probability of killing an insect at dose 2.5:
+```{r}
+# prediction at linear predictor scale
+predict(mlogit, newdata = tibble(conc = 2.5), type = "link", se.fit = TRUE)
+# prediction at probability scale
+predict(mlogit, newdata = tibble(conc = 2.5), type = "response", se.fit = TRUE)
+```
+To manually check:
+```{r}
+lmodsum <- summary(mlogit)
+x0 <- c(1, 2.5)
+eta0 <- sum(x0 * coef(mlogit))
+ilogit(eta0)
+```
+To quantify the uncertainty in this prediction, we need the matrix $\left( \mathbf{X}^T \widehat{\mathbf{W}} \mathbf{X} \right)^{-1}$:
+```{r}
+(cm <-lmodsum$cov.unscaled)
+```
+So the standard error of $\widehat{\eta}$ is
+```{r}
+(se <- sqrt(t(x0) %*% cm %*% x0))
+```
+and a 95% confidence interval on the probability scale is
+```{r}
+ilogit(c(eta0 - 1.96 * se, eta0 + 1.96 * se))
+```
+
+## Effective doses, ED50 and LD50
+
+- When there is a single continuous predictor or when other predictors are held fixed, we may wish to estimate the value of $x$ corresponding to a chosen $p$. 
+
+- **ED50** stands for the **effective dose** for which there will be a 50% chance of "success". When a "success" is to kill the subjects or determine toxicity, the term **LD50** (**lethal dose**) would be used.
+
+- Solving
+$$
+p = \frac{e^{\beta_0 + x \beta_1}}{1 + e^{\beta_0 + x \beta_1}} = 0.5
+$$
+yields
+$$
+\widehat{\text{ED}_{50}} = - \frac{\widehat{\beta}_0}{\widehat{\beta}_1}.
+$$
+
+- In the `bliss` data,
+```{r}
+(ld50 <- - mlogit$coef[1] / mlogit$coef[2])
+```
+
+- To quantify the uncertainty in estimating ED50 or LD50, we can use the delta method
+$$
+\operatorname{Var} g\left(\widehat{\boldsymbol{\theta}}\right) \approx \nabla g\left(\widehat{\boldsymbol{\theta}}\right)^T \cdot \operatorname{Var} \widehat{\boldsymbol{\theta}} \cdot \nabla g\left(\widehat{\boldsymbol{\theta}}\right).
+$$
+For ED50 or LD50
+$$
+\nabla g(\beta_0, \beta_1) = \begin{pmatrix} - \frac{1}{\beta_1} \\ \frac{\beta_0}{\beta_1^2} \end{pmatrix}.
+$$
+
+- For the `bliss` data, the standard error of LD50 is
+```{r}
+dr <- c(- 1 / mlogit$coef[2], mlogit$coef[1] / mlogit$coef[2]^2)
+(se <- sqrt(dr %*% lmodsum$cov.unscaled %*% dr)[1, 1])
+```
+leading to a 95% confidence interval
+```{r}
+c(ld50 - 1.96 * se, ld50 + 1.96 * se)
+```
+
+- The MASS package has a convenience function `dose.p` for calculating the effective doses and their standard errors
+```{r}
+library(MASS)
+dose.p(mlogit, p = c(0.25, 0.5, 0.75))
+```
+
+## Conditional logistic regression for matched case-control studies
+
+- In case-control studies, we try to determine the effect of certain risk factors on the outcome. Ideally we hope to collect all confouding variables and model them in the correct way in the logistic regression. In reality, it can be difficult. 
+
+- In a **matched case-control study**, we match each case with one or more controls that have the same or similar values of some set of potential confouding variables. For example, if we have a 56-year-old, Hispanic male case, we try to match him with a few controls who are also 56-year-old Hispanic males. Matching also gvies us the possibility of adjusting for confounders that are difficult to measure, e.g., diet, environmental exposure, etc. 
+
+- Disadvantages of matched case-control study include  
+    1. it can be difficult to form the matched sets,  
+    2. one cannot estimate the effects of the variables used to determine the matches,  
+    3. it may be difficult to generalize to the population.  
+    
+- In a **1:M design**, we match $M$ controls to each case. Suppose we have $n$ matched sets and we take $i=0$ to represent the case and $i=1,\ldots,M$ to represent the controls. We propose a logistic regression
+$$
+\text{logit}(p_j(\mathbf{x}_{ij})) = \alpha_j + \mathbf{x}_{ij}^T \boldsymbol{\beta},
+$$
+where $\alpha_j$ models the effect of the confounding variables in the $j$-th matched set. Thus
+$$
+p_j(\mathbf{x}_{ij}) = \frac{e^{\alpha_j + \mathbf{x}_{ij}^T \boldsymbol{\beta}}}{1 + e^{\alpha_j + \mathbf{x}_{ij}^T \boldsymbol{\beta}}}, \quad i = 0, 1, \ldots, M.
+$$
+
+- Given a matched set $j$ of $M+1$ subjects known to have one case and $M$ controls, the conditional probability of the observed outcome, or, in other words, that subject $i=0$ is the case and the rest are controls is
+\begin{eqnarray*}
+& & \mathbb{P} \left( Y_{0j}=1, Y_{1j}=\cdots = Y_{Mj}=0 \mid \sum_{i=0}^M Y_{ij} = 1 \right) \\
+&=& \frac{p_j(\mathbf{x}_{0j}) \prod_{i=1}^M (1 - p_j(\mathbf{x}_{ij}))}{\sum_{i=0}^M p_j(\mathbf{x}_{ij}) \prod_{i'\ne i} (1 - p_j(\mathbf{x}_{i'j}))} \\
+&=&  \frac{\exp \mathbf{x}_{0j}^T \boldsymbol{\beta}}{\sum_{i=0}^M \exp \mathbf{x}_{ij}^T \boldsymbol{\beta}} \\
+&=& \frac{1}{1 + \sum_{i=1}^M \exp (\mathbf{x}_{ij} - \mathbf{x}_{0j})^T \boldsymbol{\beta}}.
+\end{eqnarray*}
+$\alpha_j$ conveniently cancels out in the final expression. We can form the conditional likelihood function
+$$
+L(\boldsymbol{\beta}) = \prod_{j=1}^n \frac{1}{1 + \sum_{i=1}^M \exp (\mathbf{x}_{ij} - \mathbf{x}_{0j})^T \boldsymbol{\beta}},
+$$
+which is identical to that from a Cox proportional hazards mdoel.
+
+- The `amlxray` data concerns the x-ray exposure and childhood acute myeloid leukemia. The sets are matched on age, race, and county of residence. 
+```{r}
+(amlxray <- as_tibble(amlxray))
+```
+Downs syndrome is a known risk factor. In this data set, all Downs syndrome children are cases. The coefficient for `downs` will be infinity.
+```{r}
+amlxray %>%
+  filter(downs == "yes") %>%
+  print(width = Inf)
+```
+So we exclude Donws syndrome cases and their matched subjects.
+```{r}
+(downs_ids <- amlxray %>% 
+   filter(downs == "yes") %>% 
+   .$ID)
+ramlxray <- amlxray %>%
+  filter(!(ID %in% downs_ids))
+```
+Now we can fit a conditional logit model using predictors `Sex`, `Mray` (mother exposure to x-ray), `Fray` (father exposure to x-ray), and `CnRay` (child exposure to x-ray). Since `CnRray` is an ordered factor, linear, quadratic, and cubic contrasts (from orthogonal polynomial coding) are estimated. Only the linear effect is significant.
+```{r}
+library(survival)
+
+cmod <- clogit(disease ~ Sex + Mray + Fray + CnRay + strata(ID), data = ramlxray)
+summary(cmod)
+```
+We drop the qudratic and cubic effects of `CnRray` and the insignificant predictors `Mray` and `Sex`.
+```{r}
+clogit(disease ~ Fray + unclass(CnRay) + strata(ID), data = ramlxray) %>%
+  tbl_regression(intercept = TRUE, exponentiate = TRUE)
+```
+
+## Separation (ELMR 2.7)
+
+- Let's start with the famours Fisher Iris data. We restrict to species `setosa` and `versicolor` and classify them using predictors `Sepal.Width` and `Sepal.Length`. 
+```{r}
+(irisr <- iris %>%
+  as_tibble() %>%
+  filter(Species == "setosa" | Species == "versicolor") %>%
+  dplyr::select(Sepal.Width, Sepal.Length, Species))
+```
+
+- We fit a logistic regression:
+```{r}
+lmod <- glm(Species ~ Sepal.Width + Sepal.Length, family = binomial, data = irisr)
+summary(lmod)
+```
+`glm` function is complaining there is some issue in algorithmic convergence. The residual deviance is essential 0, indicating a perfect fit, but none of the predictors are significant. 
+
+- Graphical summary of the data reveals that the two species `setosa` and `versicolor` are perfectly separable by a straight line $\eta = \beta_0 + x_{\text{Sepal.Width}} \beta_{\text{Sepal.Width}} + x_{\text{Sepal.Length}} \beta_{\text{Sepal.Length}} = 0$.
+```{r}
+irisr %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) + 
+  geom_abline(intercept = - lmod$coef[1] / lmod$coef[3], 
+              slope     = - lmod$coef[2] / lmod$coef[3]) + 
+  labs(title = "Perfect separation in Iris data")
+```
+
+- For correct inference, we can use the bias reduction method implemented in `brglm` package. It gives finite estimates and correct inference on the coefficients.
+```{r}
+library(brglm)
+
+bmod <- brglm(Species ~ Sepal.Width + Sepal.Length, family = binomial, data = irisr)
+summary(bmod)
+```
