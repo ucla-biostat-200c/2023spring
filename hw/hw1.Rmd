@@ -43,7 +43,7 @@ To submit homework, please submit Rmd and html files to bruinlearn by the deadli
 
 ### Q2.1
 
-Write down the log-likelihood function of logistic regresion for binomial responses.
+Write down the log-likelihood function of logistic regression for binomial responses.
 
 ### Q2.2
 
@@ -75,11 +75,37 @@ Refit the model but now without the insulin and triceps predictors. How many obs
 
 ### Q3.5
 
-Use AIC to select a model. You will need to take account of the missing val- ues. Which predictors are selected? How many cases are used in your selected model?
+Use AIC to select a model. You will need to take account of the missing values. Which predictors are selected? How many cases are used in your selected model?
 
 ### Q3.6
 
 Create a variable that indicates whether the case contains a missing value. Use this variable as a predictor of the test result. Is missingness associated with the test result? Refit the selected model, but now using as much of the data as reasonable. Explain why it is appropriate to do this.
+
+```{r}
+library(faraway)
+library(tidyverse)
+
+pima <- pima %>% 
+  mutate(
+    glucose2  = ifelse(glucose == 0, NA, glucose),
+    diastolic2 = ifelse(diastolic == 0, NA, diastolic),
+    triceps2 = ifelse(triceps == 0, NA, triceps),
+    insulin2 = ifelse(insulin == 0, NA, insulin),
+    bmi2 = ifelse(bmi == 0, NA, bmi), 
+    diabetes2 = ifelse(diabetes == 0, NA, diabetes),
+    age2 = ifelse(age == 0, NA, age))
+
+pima$missingNA = ifelse(apply(is.na(dplyr::select(pima, contains("2"))), 1, sum) > 0, 1, 0)
+
+missing.glm <- glm(test ~ missingNA, family = binomial(), data = pima)
+
+library(gtsummary)
+missing.glm %>%
+  tbl_regression() %>%
+  bold_labels() %>%
+  bold_p(t = 0.05)
+```
+From above regression, we found missingness was not associate with outcome. This means that the distribution of outcome when removing data with missing is still a representative of the original distribution. This justifies the use of "complete case" analysis. 
 
 ### Q3.7
 
