@@ -1,0 +1,104 @@
+---
+title: "Biostat 200C Homework 2"
+subtitle: Due Apr 28 @ 11:59PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+
+## Q1. Beta-Binomial 
+
+Let $Y_i$ be the number of successes in $n_i$ trials with
+$$
+Y_i \sim \text{Bin}(n_i, \pi_i),
+$$
+where the probabilities $\pi_i$ have a Beta distribution
+$$
+\pi \sim \text{Be}(\alpha, \beta)
+$$
+with density function
+$$
+f(x; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \quad x \in [0, 1], \alpha > 0, \beta > 0.
+$$
+
+### Q1.1
+
+Find the mean and variance of $\pi$.
+
+### Q1.2
+
+Find the mean and variance of $Y_i$ and show that the variance of $Y_i$ is always larger than or equal to that of a Binomial random variable with the same batch size and mean.
+
+## Q2. Motivation for quasi-binomial
+
+Verify that the log-likilihood $\ell_i$ of a binomial proportion $Y_i$, where $m_i Y_i \sim \text{Bin}(m_i, p_i)$, satisfies  
+\begin{eqnarray*}
+\mathbb{E} \frac{\partial \ell_i}{\partial \mu_i} &=& 0 \\
+\operatorname{Var} \frac{\partial \ell_i}{\partial \mu_i} &=& \frac{1}{\phi V(\mu_i)} \\
+\mathbb{E} \frac{\partial \ell_i^2}{\partial^2 \mu_i} &=& - \frac{1}{\phi V(\mu_i)},
+\end{eqnarray*}
+with $\phi = 1$, $\mu_i = p_i$, and $V(\mu_i) = p_i (1 - p_i)/m_i$. Therefore the $U_i$ in quasi-binomial method mimics the behavior of a binomial model.
+
+## Q3. Concavity of Poisson regression log-likelihood 
+
+Let $Y_1,\ldots,Y_n$ be independent random variables with $Y_i \sim \text{Poisson}(\mu_i)$ and $\log \mu_i = \mathbf{x}_i^T \boldsymbol{\beta}$, $i = 1,\ldots,n$.
+
+### Q3.1
+
+Write down the log-likelihood function.
+
+### Q3.2
+
+Derive the gradient vector and Hessian matrix of the log-likelhood function with respect to the regression coefficients $\boldsymbol{\beta}$. 
+
+### Q3.3
+
+Show that the log-likelihood function of the log-linear model is a concave function in regression coefficients $\boldsymbol{\beta}$. (Hint: show that the negative Hessian is a positive semidefinite matrix.)
+
+### Q3.4
+
+Show that for the fitted values $\widehat{\mu}_i$ from maximum likelihood estimates
+$$
+\sum_i \widehat{\mu}_i = \sum_i y_i.
+$$
+Therefore the deviance reduces to
+$$
+D = 2 \sum_i y_i \log \frac{y_i}{\widehat{\mu}_i}.
+$$
+
+## Q4. Odds ratios
+
+Consider a $2 \times 2$ contingency table from a prospective study in which people who were or were not exposed to some pollutant are followed up and, after several years, categorized according to the presense or absence of a disease. Following table shows the probabilities for each cell. The odds of disease for either exposure group is $O_i = \pi_i / (1 - \pi_i)$, for $i = 1,2$, and so the odds ratio is
+$$
+\phi = \frac{O_1}{O_2} = \frac{\pi_1(1 - \pi_2)}{\pi_2 (1 - \pi_1)}
+$$
+is a measure of the relative likelihood of disease for the exposed and not exposed groups.
+
+|             | Diseased | Not diseased |
+|:-----------:|----------|--------------|
+| Exposed     | $\pi_1$  | $1 - \pi_1$  |
+| Not exposed | $\pi_2$  | $1 - \pi_2$  |
+
+### Q4.1
+
+For the simple logistic model
+$$
+\pi_i = \frac{e^{\beta_i}}{1 + e^{\beta_i}}, 
+$$
+show that if there is no difference between the exposed and not exposed groups (i.e., $\beta_1 = \beta_2$), then $\phi = 1$.
+
+### Q4.2 
+
+Consider $J$ $2 \times 2$ tables, one for each level $x_j$ of a factor, such as age group, with $j=1,\ldots, J$. For the logistic model
+$$
+\pi_{ij} = \frac{e^{\alpha_i + \beta_i x_j}}{1 + e^{\alpha_i + \beta_i x_j}}, \quad i = 1,2, \quad j= 1,\ldots, J.
+$$
+Show that $\log \phi$ is constant over all tables if $\beta_1 = \beta_2$.
+
+
+
