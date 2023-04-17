@@ -1,6 +1,6 @@
 ---
 title: "Biostat 200C Homework 2"
-subtitle: Due Apr  @ 11:59PM
+subtitle: Due Apr 27 @ 11:59PM
 output: 
   html_document:
     toc: true
@@ -264,4 +264,6 @@ Find the best sub-model using the AIC criterion.
 ### Q1.11
 
 Find the best sub-model using the lasso with cross validation.
+
+### 
 
