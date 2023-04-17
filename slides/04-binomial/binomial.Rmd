@@ -216,7 +216,7 @@ orings %>%
     
     - Are the failure probability of those 6 O-rings in a space shuttle same?  
     
-- Violation of the iid (identically and independently distributed) assumption of Bernoulli trials can lead to inflation of variance. (HW2: compare the variance of beta-binomial to that of binomial.)
+- Violation of the iid (identically and independently distributed) assumption of Bernoulli trials can lead to inflation of variance. (**Exercise**: compare the variance of beta-binomial to that of binomial.)
 
 - We can relax the assumption of binomial distribution by allowing an **overdispersion parameter**
 $$
@@ -286,7 +286,7 @@ with
 \mathbb{E}(U_i) &=& 0, \quad
 \operatorname{Var}(U_i) = \frac{1}{\phi V(\mu_i)} \\ - \mathbb{E} \frac{\partial U_i}{\partial \mu_i} &=& - \mathbb{E} \frac{- \phi V(\mu_i) - (Y_i - \mu_i) \phi V'(\mu_i)}{[\phi V(\mu_i)]^2} = \frac{1}{\phi V(\mu_i)}.
 \end{eqnarray*}
-**HW2**: Verify that the log-likilihood $\ell_i$ of a binomial proportion $Y_i$, where $m_i Y_i \sim \text{Bin}(m_i, p_i)$, satisfies  
+**Exercise**: Verify that the log-likilihood $\ell_i$ of a binomial proportion $Y_i$, where $m_i Y_i \sim \text{Bin}(m_i, p_i)$, satisfies  
 \begin{eqnarray*}
 \mathbb{E} \frac{\partial \ell_i}{\partial \mu_i} &=& 0 \\
 \operatorname{var} \frac{\partial \ell_i}{\partial \mu_i} &=& \frac{1}{\phi V(\mu_i)} \\
