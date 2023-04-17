@@ -373,8 +373,15 @@ preparation</a></li>
 <li><a href="#q1.9" id="toc-q1.9">Q1.9</a></li>
 <li><a href="#q1.10" id="toc-q1.10">Q1.10</a></li>
 <li><a href="#q1.11" id="toc-q1.11">Q1.11</a></li>
-<li><a href="#section" id="toc-section"></a></li>
 </ul></li>
+<li><a href="#q2.-odds-ratios" id="toc-q2.-odds-ratios">Q2. Odds
+ratios</a>
+<ul>
+<li><a href="#q2.1" id="toc-q2.1">Q2.1</a></li>
+<li><a href="#q2.2" id="toc-q2.2">Q2.2</a></li>
+</ul></li>
+<li><a href="#q3.-elmr-chapter-4-excercise-3" id="toc-q3.-elmr-chapter-4-excercise-3">Q3. ELMR Chapter 4 Excercise
+3</a></li>
 </ul>
 </div>
 
@@ -1561,9 +1568,65 @@ space?</p>
 <h3>Q1.11</h3>
 <p>Find the best sub-model using the lasso with cross validation.</p>
 </div>
-<div id="section" class="section level3">
-<h3></h3>
 </div>
+<div id="q2.-odds-ratios" class="section level2">
+<h2>Q2. Odds ratios</h2>
+<p>Consider a <span class="math inline">\(2 \times 2\)</span>
+contingency table from a prospective study in which people who were or
+were not exposed to some pollutant are followed up and, after several
+years, categorized according to the presense or absence of a disease.
+Following table shows the probabilities for each cell. The odds of
+disease for either exposure group is <span class="math inline">\(O_i =
+\pi_i / (1 - \pi_i)\)</span>, for <span class="math inline">\(i =
+1,2\)</span>, and so the odds ratio is <span class="math display">\[
+\phi = \frac{O_1}{O_2} = \frac{\pi_1(1 - \pi_2)}{\pi_2 (1 - \pi_1)}
+\]</span> is a measure of the relative likelihood of disease for the
+exposed and not exposed groups.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th>Diseased</th>
+<th>Not diseased</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Exposed</td>
+<td><span class="math inline">\(\pi_1\)</span></td>
+<td><span class="math inline">\(1 - \pi_1\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">Not exposed</td>
+<td><span class="math inline">\(\pi_2\)</span></td>
+<td><span class="math inline">\(1 - \pi_2\)</span></td>
+</tr>
+</tbody>
+</table>
+<div id="q2.1" class="section level3">
+<h3>Q2.1</h3>
+<p>For the simple logistic model <span class="math display">\[
+\pi_i = \frac{e^{\beta_i}}{1 + e^{\beta_i}},
+\]</span> show that if there is no difference between the exposed and
+not exposed groups (i.e., <span class="math inline">\(\beta_1 =
+\beta_2\)</span>), then <span class="math inline">\(\phi =
+1\)</span>.</p>
+</div>
+<div id="q2.2" class="section level3">
+<h3>Q2.2</h3>
+<p>Consider <span class="math inline">\(J\)</span> <span class="math inline">\(2 \times 2\)</span> tables, one for each level
+<span class="math inline">\(x_j\)</span> of a factor, such as age group,
+with <span class="math inline">\(j=1,\ldots, J\)</span>. For the
+logistic model <span class="math display">\[
+\pi_{ij} = \frac{e^{\alpha_i + \beta_i x_j}}{1 + e^{\alpha_i + \beta_i
+x_j}}, \quad i = 1,2, \quad j= 1,\ldots, J.
+\]</span> Show that <span class="math inline">\(\log \phi\)</span> is
+constant over all tables if <span class="math inline">\(\beta_1 =
+\beta_2\)</span>.</p>
+</div>
+</div>
+<div id="q3.-elmr-chapter-4-excercise-3" class="section level2">
+<h2>Q3. ELMR Chapter 4 Excercise 3</h2>
 </div>
 
 

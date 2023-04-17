@@ -265,5 +265,36 @@ Find the best sub-model using the AIC criterion.
 
 Find the best sub-model using the lasso with cross validation.
 
-### 
+## Q2. Odds ratios
+
+Consider a $2 \times 2$ contingency table from a prospective study in which people who were or were not exposed to some pollutant are followed up and, after several years, categorized according to the presense or absence of a disease. Following table shows the probabilities for each cell. The odds of disease for either exposure group is $O_i = \pi_i / (1 - \pi_i)$, for $i = 1,2$, and so the odds ratio is
+$$
+\phi = \frac{O_1}{O_2} = \frac{\pi_1(1 - \pi_2)}{\pi_2 (1 - \pi_1)}
+$$
+is a measure of the relative likelihood of disease for the exposed and not exposed groups.
+
+|             | Diseased | Not diseased |
+|:-----------:|----------|--------------|
+| Exposed     | $\pi_1$  | $1 - \pi_1$  |
+| Not exposed | $\pi_2$  | $1 - \pi_2$  |
+
+### Q2.1
+
+For the simple logistic model
+$$
+\pi_i = \frac{e^{\beta_i}}{1 + e^{\beta_i}}, 
+$$
+show that if there is no difference between the exposed and not exposed groups (i.e., $\beta_1 = \beta_2$), then $\phi = 1$.
+
+### Q2.2 
+
+Consider $J$ $2 \times 2$ tables, one for each level $x_j$ of a factor, such as age group, with $j=1,\ldots, J$. For the logistic model
+$$
+\pi_{ij} = \frac{e^{\alpha_i + \beta_i x_j}}{1 + e^{\alpha_i + \beta_i x_j}}, \quad i = 1,2, \quad j= 1,\ldots, J.
+$$
+Show that $\log \phi$ is constant over all tables if $\beta_1 = \beta_2$.
+
+## Q3. ELMR Chapter 4 Excercise 3
+
+
 
