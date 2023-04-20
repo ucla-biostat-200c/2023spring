@@ -1,0 +1,207 @@
+---
+title: "Review of Analysis of Deviance"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 18, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+## Log-Likelihood ratio 
+- A saturated model
+   + If there are $n$ observations $Y_i$, $i=1,\ldots, n$, all with potentially different values for the linear component $X_i\mathbf{\beta}$, then we can specify a model with $n$ parameters to let the predicted $Y_i$ be the same as observed $Y_i$. 
+   + If some of the observations correspond to the same linear combinations of the predictors, the number of parameters in the saturated model can be less than $n$. 
+   + We use $m$ to denote the number of parameters can be estimated in a saturated model.
+   + Let $\mathbf{\beta}_{max}$ be the parameter vector from the saturated model. 
+   + Let $\mathbf{b}_{max}$ be MLE from the saturated model and $L(\mathbf{b}_{max})$ be the likelihood evaluated at $\mathbf{b}_{max}$, which is larger than any other likelihood function.
+- Let $L(\mathbf{b})$ be the maximum value of the likelihood function fo the model of interest. 
+- Then the **likelihood ratio** is 
+
+$$
+\lambda = \frac{L(\mathbf{b}_{max})}{L(\mathbf{b})}
+$$
+provides a way of assessing the goodness of fit for the model. 
+
+- In terms of log-likelihood
+$$
+\log \lambda = \ell(\mathbf{b}_{max})- \ell(\mathbf{b})
+$$
+   
+
+## Deviance
+- The Deviance, also called likelihood (ratio) statistics, is
+
+$$
+D = 2 \log \frac{L (\mathbf{b}_{max})}{L(\mathbf{b})} = 2[\ell(\mathbf{b}_{max})- \ell(\mathbf{b})]
+$$
+
+- Using Taylor expansion, one can prove the sample distribution of the deviance is approximately
+$$
+D\sim \chi^2(m-p, \nu)
+$$
+
+
+## Example: Deviance for a Nomral linear model
+In linear models with normality assumption, for $i=1,\ldots, n$
+$$
+\mbox{E}(Y_i) = \mu_i = \mathbf{x}_i'\boldsymbol{\beta}; \quad Y_i \sim N(\mu_i, \sigma^2) 
+$$
+where $Y_i$ are independent. The log-likelihood function is 
+$$
+\ell(\mathbf{\beta}) = -\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu_i)^2-\frac{n}{2}\log(2\pi\sigma^2)
+$$
+
+- For a **saturated model** is to use $y_i$ as the predicted model therefore
+$$
+\ell(\mathbf{b}_{max}) = -\frac{n}{2}\log(2\pi \sigma^2)
+$$
+
+- For **a proposal model** with $p<n$ parameters, the maximum likelihood estimators are 
+$$
+b = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}
+$$
+    + The corresponding maximum value of log-likelihood is 
+$$
+\ell(\mathbf{b}) = -\frac{n}{2}\log(2\pi\sigma^2)  -\sum_{i=1}^n \frac{1}{2\sigma^2}(y_i -\mathbf{X}_i' \mathbf{b})^2.
+$$
+
+
+- Therefore the Deviance is 
+$$
+D = 2(\ell(\mathbf{b}_{max}) - \ell(\mathbf{b})) = -\sum_{i=1}^n \frac{1}{\sigma^2}(y_i -\mathbf{X}_i' \mathbf{b})^2 = \frac{1}{\sigma^2} (\mathbf{y}-\mathbf{X}\mathbf{b})'(\mathbf{y}-\mathbf{X}\mathbf{b})
+$$
+And we know 
+$$
+\mathbf{y}-\mathbf{X}\mathbf{b} = [\mathbf{I}-\mathbf{H}]\mathbf{y}
+$$
+where $H = \mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ and 
+$$
+(\mathbf{y}-\mathbf{X}\mathbf{b})'(\mathbf{y}-\mathbf{X}\mathbf{b}) = \mathbf{y}'(\mathbf{I}-\mathbf{H})\mathbf{y}
+$$
+Since the rank of $\mathbf{I}-\mathbf{H}$ is $n-p$, $D$ has a chi-squared distribution with $n-p$ degrees of freedom and non-centrality parameter $(\mathbf{X}\boldsymbol{\beta})'(\mathbf{I}-\mathbf{H})(\mathbf{X}\boldsymbol{\beta})/\sigma^2$. But $(\mathbf{I}-\mathbf{H})\mathbf{X} = 0$, therefore **$D$ has the central distribution $\chi^2(n-p)$ exactly**. 
+
+- The term scaled deviance is sometimes used for 
+$$
+\sigma^2D = \sum_{i=1}^n(y_i-\widehat{\mu}_i)^2
+$$
+where $\widehat{\mu}_i= \mathbf{X}_i' \mathbf{b}$. So if the model fits data well, then $D\sim \chi^2(n-p)$. The expected value for a random variable with $\chi^2(n-p)$ distribution is $n-p$, so the expected value of $D$ is $n-p$. 
+
+- This provides an estimate of $\sigma^2$ as 
+$$
+\widehat{\sigma}^2 = \frac{\sum_{i=1}^{n}(y_i-\widehat{\mu}_i)^2}{n-p}
+$$
+or in our lecture note, we said: "An unbiased estimate of the error variance $\sigma^2$ is"
+$$
+\widehat{\sigma} = \sqrt{\frac{\text{RSS}}{\text{df}}}
+$$
+Some program output the scaled deviance for a Normal linear model and call $\widehat{\sigma}^2$ the scale parameter.  
+
+- The deviance is also related to the sume of squares of the standardized residulas 
+$$
+\sum_{i=1}^m r_i^2 = \frac{1}{\widehat{\sigma}^2}\sum_{i=1}^n(y_i-\widehat{\mu}_i)^2
+$$
+where $\widehat{\sigma}^2$ is an estimate of $\sigma^2$. This provides a rough rule of thumb for the overall magnitude of the standardized residuals. If the model fits well so that $D\sim \chi^2(n-p)$, you would expect $\sum_{i=1}^m r_i^2 = n-p$, approximately. 
+
+### Voting data example 
+```{r}
+gavote <- gavote %>%
+  mutate(undercount = (ballots - votes) / ballots) %>%
+  rename(usage = rural) %>%
+  mutate(pergore = gore / votes, 
+         perbush = bush / votes)
+
+lmod <- lm(undercount ~ pergore + perAA, gavote)
+sumlmod <- summary(lmod)
+```
+
+1. Scaled deviance, i.e., output from `deviance`, is $\sigma^2D$
+```{r}
+RSS <- sum(residuals(sumlmod)^2)
+RSS
+deviance(lmod)
+```
+
+2. $\widehat{\sigma}$, i.e., Residual standard error from `lm` fit
+```{r}
+sigma = sqrt(RSS/df.residual(lmod))
+sigma
+
+sumlmod$sigma
+```
+
+
+## Example: Deviance for a Bionomial model
+- If the response $Y_1, \ldots, Y_n$ are independent and $Y_i\sim \text{Bin}(m_i, p_i)$, then the log-likelihood is 
+$$
+\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \left[y_i\log p_i - y_i\log(1-p_i) + m_i\log(1-p_i) + \log {m_i\choose y_i}\right]
+$$
+- For a saturated model, the $y_i$'s are independent. $p_i\in (0,1)$ has no restriction. There are $n$ parameters, i.e., $\boldsymbol{\beta} = (p_1,\ldots, p_n)'$. MLE is $\mathbf{b}_{max} = y_i/m_i$ 
+
+- For a proposed logistic model, the $y_i$'s are independent and 
+$$
+p_i = \frac{e^{\mathbf{x_i}'\boldsymbol{\beta}}}{1+e^{\mathbf{x_i}'\boldsymbol{\beta}}}
+$$
+Therefore, there are $q+1$ total number of parameters. And the MLE is 
+$$
+\hat p_i = \frac{e^{\mathbf{x_i}'\mathbf{b}}}{1+e^{\mathbf{x_i}'\mathbf{b}}}
+$$
+
+- So the deviance is  
+\begin{eqnarray*}
+  D &=& 2 \sum_i y_i \log(y_i/m_i) + (m_i - y_i) \log(1 - y_i / m_i) \\
+  & & - 2 \sum_i y_i \log(\widehat{p}_i) + (m_i - y_i) \log(1 - \widehat{p}_i) \\
+  &=& 2 \sum_i y_i \log(y_i / \widehat{y}_i) + (m_i - y_i) \log(m_i - y_i)/(m_i - \widehat{y}_i),
+\end{eqnarray*}
+where $\widehat{y}_i$ are the fitted values from the model. 
+
+- When $Y$ is truely binomial and $m_i$ are relatively large, the deviance $D$ is approximately $\chi_{n-q-1}^2$ if the model is correct. A rule of thumb to use this asymptotic approximation is $m_i \ge 5$. The large p-value indicates that the model has an adequate fit.
+
+- We can define the **Perason residuals** as
+$$
+r_i^{\text{P}} = \frac{y_i - n_i \widehat{p}_i}{\sqrt{\operatorname{Var} \widehat{y}_i}}.
+$$
+Then
+$$
+X^2 = \sum_i \left(r_i^{\text{P}} \right)^2
+$$
+in analogy to $\text{RSS} = \sum_i r_i^2$ in linear regression.
+
+- Or we can define deviance residual similar in Binary outcome models
+$$
+r_{dres_i} = sign(y_i - m_i\hat{p}_i)\sqrt{y_i\ln\left(\frac{y}{m_i\hat{p}_i}\right) + (m_i-y_i)\ln\left(\frac{m_i-y_i}{m_i-m_i\hat{p_i}}\right)}
+$$
+
+### Data example
+
+```{r}
+binmod <- glm(cbind(damage, 6 - damage) ~ temp, family = binomial, data = orings)
+sumbinmod  <- summary(binmod)
+
+sumbinmod
+```
+
+```{r}
+tibble(rperson = residuals(binmod, type = "pearson"),
+  rdeviance = residuals(binmod, type = "deviance")) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = rperson, y =rdeviance)) + 
+  geom_abline(intercept = 0, slope = 1) + 
+  xlab("Pearson residual") + 
+  ylab("Deviance residual")
+```
+
+## Hypothesis Testing 
