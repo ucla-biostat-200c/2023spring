@@ -416,17 +416,17 @@ Testing</a></li>
 <ul>
 <li>If there are <span class="math inline">\(n\)</span> observations
 <span class="math inline">\(Y_i\)</span>, <span class="math inline">\(i=1,\ldots, n\)</span>, all with potentially
-different values for the linear component <span class="math inline">\(X_i\mathbf{\beta}\)</span>, then we can specify a
-model with <span class="math inline">\(n\)</span> parameters to let the
-predicted <span class="math inline">\(Y_i\)</span> be the same as
-observed <span class="math inline">\(Y_i\)</span>.</li>
+different values for the linear component <span class="math inline">\(X_i&#39;\boldsymbol{\beta}\)</span>, then we can
+specify a model with <span class="math inline">\(n\)</span> parameters
+to let the predicted <span class="math inline">\(Y_i\)</span> be the
+same as observed <span class="math inline">\(Y_i\)</span>.</li>
 <li>If some of the observations correspond to the same linear
 combinations of the predictors, the number of parameters in the
 saturated model can be less than <span class="math inline">\(n\)</span>.</li>
 <li>We use <span class="math inline">\(m\)</span> to denote the number
 of parameters can be estimated in a saturated model.</li>
-<li>Let <span class="math inline">\(\mathbf{\beta}_{max}\)</span> be the
-parameter vector from the saturated model.</li>
+<li>Let <span class="math inline">\(\boldsymbol{\beta}_{max}\)</span> be
+the parameter vector from the saturated model.</li>
 <li>Let <span class="math inline">\(\mathbf{b}_{max}\)</span> be MLE
 from the saturated model and <span class="math inline">\(L(\mathbf{b}_{max})\)</span> be the likelihood
 evaluated at <span class="math inline">\(\mathbf{b}_{max}\)</span>,
@@ -447,7 +447,8 @@ model.</p></li>
 <div id="deviance" class="section level2">
 <h2>Deviance</h2>
 <ul>
-<li>The Deviance, also called likelihood (ratio) statistic, is</li>
+<li>The Deviance, also called <strong>likelihood (ratio)
+statistic</strong>, is</li>
 </ul>
 <p><span class="math display">\[
 D = 2 \log \frac{L (\mathbf{b}_{max})}{L(\mathbf{b})} =
@@ -471,7 +472,7 @@ independent. The log-likelihood function is <span class="math display">\[
 -\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu_i)^2-\frac{n}{2}\log(2\pi\sigma^2)
 \]</span></p>
 <ul>
-<li><p>For a <strong>saturated model</strong>, we use <span class="math inline">\(y_i\)</span> as the predicted model. Therefore
+<li><p>For a <strong>saturated model</strong>, we use <span class="math inline">\(y_i\)</span> as the predicted value. Therefore
 <span class="math display">\[
 \ell(\mathbf{b}_{max}) = -\frac{n}{2}\log(2\pi \sigma^2)
 \]</span></p></li>
