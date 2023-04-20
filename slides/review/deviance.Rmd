@@ -34,7 +34,7 @@ library(faraway)
 $$
 \lambda = \frac{L(\mathbf{b}_{max})}{L(\mathbf{b})}
 $$
-provides a way of assessing the goodness of fit for the model. 
+    provides a way of assessing the goodness of fit for the model. 
 
 - In terms of log-likelihood
 $$
@@ -43,7 +43,7 @@ $$
    
 
 ## Deviance
-- The Deviance, also called likelihood (ratio) statistics, is
+- The Deviance, also called likelihood (ratio) statistic, is
 
 $$
 D = 2 \log \frac{L (\mathbf{b}_{max})}{L(\mathbf{b})} = 2[\ell(\mathbf{b}_{max})- \ell(\mathbf{b})]
@@ -55,7 +55,7 @@ D\sim \chi^2(m-p, \nu)
 $$
 
 
-## Example: Deviance for a Nomral linear model
+## Example: Deviance for a Normal linear model
 In linear models with normality assumption, for $i=1,\ldots, n$
 $$
 \mbox{E}(Y_i) = \mu_i = \mathbf{x}_i'\boldsymbol{\beta}; \quad Y_i \sim N(\mu_i, \sigma^2) 
@@ -65,12 +65,12 @@ $$
 \ell(\mathbf{\beta}) = -\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu_i)^2-\frac{n}{2}\log(2\pi\sigma^2)
 $$
 
-- For a **saturated model** is to use $y_i$ as the predicted model therefore
+- For a **saturated model**, we use $y_i$ as the predicted model. Therefore
 $$
 \ell(\mathbf{b}_{max}) = -\frac{n}{2}\log(2\pi \sigma^2)
 $$
 
-- For **a proposal model** with $p<n$ parameters, the maximum likelihood estimators are 
+- For **a proposed model** with $p<n$ parameters, the maximum likelihood estimators are 
 $$
 b = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}
 $$
@@ -170,7 +170,7 @@ where $\widehat{y}_i$ are the fitted values from the model.
 
 - When $Y$ is truely binomial and $m_i$ are relatively large, the deviance $D$ is approximately $\chi_{n-q-1}^2$ if the model is correct. A rule of thumb to use this asymptotic approximation is $m_i \ge 5$. The large p-value indicates that the model has an adequate fit.
 
-- We can define the **Perason residuals** as
+- We can define the **Pearson residuals** as
 $$
 r_i^{\text{P}} = \frac{y_i - n_i \widehat{p}_i}{\sqrt{\operatorname{Var} \widehat{y}_i}}.
 $$
@@ -182,7 +182,7 @@ in analogy to $\text{RSS} = \sum_i r_i^2$ in linear regression.
 
 - Or we can define deviance residual similar in Binary outcome models
 $$
-r_{dres_i} = sign(y_i - m_i\hat{p}_i)\sqrt{y_i\ln\left(\frac{y}{m_i\hat{p}_i}\right) + (m_i-y_i)\ln\left(\frac{m_i-y_i}{m_i-m_i\hat{p_i}}\right)}
+r_{dres_i} = \text{sign}(y_i - m_i\widehat{p}_i)\sqrt{y_i\ln\left(\frac{y}{m_i\widehat{p}_i}\right) + (m_i-y_i)\ln\left(\frac{m_i-y_i}{m_i-m_i\widehat{p}_i}\right)}
 $$
 
 ### Data example

@@ -360,8 +360,8 @@ display: none;
 <ul>
 <li><a href="#log-likelihood-ratio" id="toc-log-likelihood-ratio">Log-Likelihood ratio</a></li>
 <li><a href="#deviance" id="toc-deviance">Deviance</a></li>
-<li><a href="#example-deviance-for-a-nomral-linear-model" id="toc-example-deviance-for-a-nomral-linear-model">Example: Deviance
-for a Nomral linear model</a>
+<li><a href="#example-deviance-for-a-normal-linear-model" id="toc-example-deviance-for-a-normal-linear-model">Example: Deviance
+for a Normal linear model</a>
 <ul>
 <li><a href="#voting-data-example" id="toc-voting-data-example">Voting
 data example</a></li>
@@ -449,7 +449,7 @@ model.</p>
 <div id="deviance" class="section level2">
 <h2>Deviance</h2>
 <ul>
-<li>The Deviance, also called likelihood (ratio) statistics, is</li>
+<li>The Deviance, also called likelihood (ratio) statistic, is</li>
 </ul>
 <p><span class="math display">\[
 D = 2 \log \frac{L (\mathbf{b}_{max})}{L(\mathbf{b})} =
@@ -462,8 +462,8 @@ D\sim \chi^2(m-p, \nu)
 \]</span></li>
 </ul>
 </div>
-<div id="example-deviance-for-a-nomral-linear-model" class="section level2">
-<h2>Example: Deviance for a Nomral linear model</h2>
+<div id="example-deviance-for-a-normal-linear-model" class="section level2">
+<h2>Example: Deviance for a Normal linear model</h2>
 <p>In linear models with normality assumption, for <span class="math inline">\(i=1,\ldots, n\)</span> <span class="math display">\[
 \mbox{E}(Y_i) = \mu_i = \mathbf{x}_i&#39;\boldsymbol{\beta}; \quad Y_i
 \sim N(\mu_i, \sigma^2)
@@ -473,11 +473,11 @@ independent. The log-likelihood function is <span class="math display">\[
 -\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu_i)^2-\frac{n}{2}\log(2\pi\sigma^2)
 \]</span></p>
 <ul>
-<li><p>For a <strong>saturated model</strong> is to use <span class="math inline">\(y_i\)</span> as the predicted model therefore
+<li><p>For a <strong>saturated model</strong>, we use <span class="math inline">\(y_i\)</span> as the predicted model. Therefore
 <span class="math display">\[
 \ell(\mathbf{b}_{max}) = -\frac{n}{2}\log(2\pi \sigma^2)
 \]</span></p></li>
-<li><p>For <strong>a proposal model</strong> with <span class="math inline">\(p&lt;n\)</span> parameters, the maximum likelihood
+<li><p>For <strong>a proposed model</strong> with <span class="math inline">\(p&lt;n\)</span> parameters, the maximum likelihood
 estimators are <span class="math display">\[
 b = (\mathbf{X}&#39;\mathbf{X})^{-1}\mathbf{X}&#39;\mathbf{Y}
 \]</span></p>
@@ -594,7 +594,7 @@ and <span class="math inline">\(m_i\)</span> are relatively large, the
 deviance <span class="math inline">\(D\)</span> is approximately <span class="math inline">\(\chi_{n-q-1}^2\)</span> if the model is correct. A
 rule of thumb to use this asymptotic approximation is <span class="math inline">\(m_i \ge 5\)</span>. The large p-value indicates
 that the model has an adequate fit.</p></li>
-<li><p>We can define the <strong>Perason residuals</strong> as <span class="math display">\[
+<li><p>We can define the <strong>Pearson residuals</strong> as <span class="math display">\[
 r_i^{\text{P}} = \frac{y_i - n_i \widehat{p}_i}{\sqrt{\operatorname{Var}
 \widehat{y}_i}}.
 \]</span> Then <span class="math display">\[
@@ -603,9 +603,9 @@ X^2 = \sum_i \left(r_i^{\text{P}} \right)^2
 r_i^2\)</span> in linear regression.</p></li>
 <li><p>Or we can define deviance residual similar in Binary outcome
 models <span class="math display">\[
-r_{dres_i} = sign(y_i -
-m_i\hat{p}_i)\sqrt{y_i\ln\left(\frac{y}{m_i\hat{p}_i}\right) +
-(m_i-y_i)\ln\left(\frac{m_i-y_i}{m_i-m_i\hat{p_i}}\right)}
+r_{dres_i} = \text{sign}(y_i -
+m_i\widehat{p}_i)\sqrt{y_i\ln\left(\frac{y}{m_i\widehat{p}_i}\right) +
+(m_i-y_i)\ln\left(\frac{m_i-y_i}{m_i-m_i\widehat{p}_i}\right)}
 \]</span></p></li>
 </ul>
 <div id="data-example" class="section level3">
