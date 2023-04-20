@@ -30,11 +30,10 @@ library(faraway)
    + Let $\mathbf{b}_{max}$ be MLE from the saturated model and $L(\mathbf{b}_{max})$ be the likelihood evaluated at $\mathbf{b}_{max}$, which is larger than any other likelihood function.
 - Let $L(\mathbf{b})$ be the maximum value of the likelihood function fo the model of interest. 
 - Then the **likelihood ratio** is 
-
 $$
 \lambda = \frac{L(\mathbf{b}_{max})}{L(\mathbf{b})}
 $$
-    provides a way of assessing the goodness of fit for the model. 
+        provides a way of assessing the goodness of fit for the model. 
 
 - In terms of log-likelihood
 $$
