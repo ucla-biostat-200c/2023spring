@@ -164,7 +164,7 @@ babyfood %>%
   # change reference level to Breast and Girl
   mutate(food = relevel(food, ref = "Breast"), sex = relevel(sex, ref = "Girl")) %>% 
   glm(cbind(disease, nondisease) ~ sex + food, family = binomial, data = .) %>%
-  tbl_regression(intercept = TRUE, exponentiate = TRUE)
+  tbl_regression(intercept = TRUE, exponentiate = F)
 ```
 
 The regression coefficient 0.67 for `Bottle` respresents the increased risk of developing respiratory disease incurred by bottle feeding relative to breast feeding. Similarly the regression coefficient `0.31` represents the increased risk of boys relative to girls. 
@@ -177,7 +177,7 @@ babyfood %>%
   pivot_longer(disease:nondisease, names_to = "dis", values_to = "count") %>%
   mutate(dis = relevel(as.factor(dis), ref = "nondisease")) %>%
   glm(sex ~ dis + food, family = binomial, weights = count, data = .) %>%
-  tbl_regression(intercept = TRUE, exponentiate = TRUE)
+  tbl_regression(intercept = TRUE, exponentiate = F)
 ```
 
 - We see that using logistic regression for the retrospective design is as effective as a prospective design for estimating a relative risk. Retrospective design is more convenient because   
