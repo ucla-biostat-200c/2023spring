@@ -40,4 +40,17 @@ $$
 D = 2 \sum_i y_i \log \frac{y_i}{\widehat{\mu}_i}.
 $$
 
-## Q5. ELMR Chapter 5 Exercise 5 (p100)
+## Q3. Show negative binomial distribution mean and variance 
+
+Recall the probability mass function of negative binomial distribution is 
+$$
+\mathbb{P}(Y = y) = \binom{y + r - 1}{r - 1} (1 - p)^r p^y, \quad y = 0, 1, \ldots
+$$
+Show $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
+
+## Q2. ELMR Chapter 5 Exercise 5 (page 100)
+
+
+
+
+

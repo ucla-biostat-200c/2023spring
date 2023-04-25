@@ -178,7 +178,7 @@ $$
 ```{r}
 summary(modp, dispersion = dp)
 ```
-```{r, eval = F}
+```{r, eval = T}
 drop1(modp, scale = dp, test = "F")
 ```
 
@@ -204,7 +204,7 @@ drop1(modd, test = "F")
 $$
 \mathbb{P}(Y = y) = \binom{y + r - 1}{r - 1} (1 - p)^r p^y, \quad y = 0, 1, \ldots
 $$
-HW2: show $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
+HW3: show $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
 
 ![](./Negbinomial.gif)
 
