@@ -1,0 +1,43 @@
+---
+title: "Biostat 200C Homework 2"
+subtitle: Due May 5 @ 11:59PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+
+To submit homework, please upload both Rmd and html files to Bruinlearn by the deadline.
+
+## Q1. Concavity of Poisson regression log-likelihood 
+
+Let $Y_1,\ldots,Y_n$ be independent random variables with $Y_i \sim \text{Poisson}(\mu_i)$ and $\log \mu_i = \mathbf{x}_i^T \boldsymbol{\beta}$, $i = 1,\ldots,n$.
+
+### Q1.1
+
+Write down the log-likelihood function.
+
+### Q1.2
+
+Derive the gradient vector and Hessian matrix of the log-likelhood function with respect to the regression coefficients $\boldsymbol{\beta}$. 
+
+### Q1.3
+
+Show that the log-likelihood function of the log-linear model is a concave function in regression coefficients $\boldsymbol{\beta}$. (Hint: show that the negative Hessian is a positive semidefinite matrix.)
+
+### Q1.4
+
+Show that for the fitted values $\widehat{\mu}_i$ from maximum likelihood estimates
+$$
+\sum_i \widehat{\mu}_i = \sum_i y_i.
+$$
+Therefore the deviance reduces to
+$$
+D = 2 \sum_i y_i \log \frac{y_i}{\widehat{\mu}_i}.
+$$
+
+## Q5. ELMR Chapter 5 Exercise 5 (p100)
