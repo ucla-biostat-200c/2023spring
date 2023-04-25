@@ -1,5 +1,5 @@
 ---
-title: "Biostat 200C Homework 2"
+title: "Biostat 200C Homework 3"
 subtitle: Due May 5 @ 11:59PM
 output: 
   html_document:
@@ -40,7 +40,7 @@ $$
 D = 2 \sum_i y_i \log \frac{y_i}{\widehat{\mu}_i}.
 $$
 
-## Q3. Show negative binomial distribution mean and variance 
+## Q2. Show negative binomial distribution mean and variance 
 
 Recall the probability mass function of negative binomial distribution is 
 $$
@@ -48,7 +48,7 @@ $$
 $$
 Show $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p)^2$.
 
-## Q2. ELMR Chapter 5 Exercise 5 (page 100)
+## Q3. ELMR Chapter 5 Exercise 5 (page 100)
 
 
 
