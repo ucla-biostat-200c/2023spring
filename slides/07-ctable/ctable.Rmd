@@ -57,6 +57,13 @@ summary(ytable)
 
 - We will analyze this data using 4 different models according to 4 different sampling schemes. They all reach the same conclusion.
 
+    1. We observed the manufacturing process for a certain period of time and observed 450 wafers. The data were then cross-classified. We could use a Poisson model.
+    2. We decided to sample 450 wafers. The data were then cross-classified. We could use a multinomial model.
+    3. We selected 400 wafers without particles and 50 wafers with particles and then recorded the good or bad outcome. We could use a binomial model.
+    4. We selected 400 wafers without particles and 50 wafers with particles that also included, by design, 334 good wafers and 116 bad ones. We could use a hypergeometric model.
+
+
+
 ### Poisson model
 
 - We observe the manufacturing process for a certain period of time and observe 450 wafers. The data are then cross-classified. We model the observed counts by Poisson.
