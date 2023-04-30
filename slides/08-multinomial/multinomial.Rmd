@@ -1,0 +1,364 @@
+---
+title: "Multinomial Data (ELMR Chapter 7)"
+author: "Dr. Jin Zhou @ UCLA"
+date: "Apr 27, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+`faraway` package contains the datasets in the ELMR book.
+
+## Multinomial logit model
+
+- Multinomial regression is a natural extension of the binomial regression to the case when responses are multivariate counts. Let $Y_{ij}$ be the number of observations falling into category $j$ for batch $i$ and let $n_i = \sum_j Y_{ij}$ be the batch size. Then
+$$
+  \mathbb{P}(Y_{i1} = y_{i1}, \ldots, Y_{iJ} = y_{iJ}) = \binom{n_i}{y_{i1} \cdots y_{iJ}} p_{i1}^{y_{i1}} \cdots p_{iJ}^{y_{iJ}}.
+$$
+
+- We distinguish between **nominal** multinomial data where there is no natural order to the categories and **ordinal** multinomial data where there is an order. The **multinomial logit** model is indended for nominal data. It can be used for ordinal data, but the informtion about order will not be used.
+
+- We use the same idea as the logistic regression.
+$$
+  \eta_{ij} = \mathbf{x}_i^T \boldsymbol{\beta}_j = \log \frac{p_{ij}}{p_{i1}}, \quad j = 2,\ldots,J.
+$$
+We need to obey the constraint that $\sum_{i=1}^J p_{ij} = 1$ so it is convenient to declare one of the categories as the baseline say $j=1$. Then we set $p_{i1} = 1 - \sum_{j=2}^J p_{ij}$ and have
+$$
+  p_{ij} = \frac{\exp(\eta_{ij})}{1 + \sum_{j=2}^J \exp(\eta_{ij})}.
+$$
+- Suppose the length of $\mathbf{x}_i$ is $p$, then the multinomial-logit model consumes $p(J-1)$ parameters.
+
+- We may estimate the parameters using MLE and the standard methods for inference.
+
+### 1996 election data
+
+- Consider an example of the 1996 American National Election Study. We consider only the education level and income group of the respondents. We will study how party identification of the respondent (Democrat, Independent or Republican) depends on predictors age, education level, and income. 
+```{r}
+(nes96 <- as_tibble(nes96))
+```
+
+- Numerical summaries:
+```{r}
+summary(nes96)
+```
+
+- The original variable `PID` (party identification) has ordered categories `strDem` (strong democratic), `weakDem` (weak democratic), `indDem` (independent democratic), `indind` (independent), `indRep` (independent republican), `weakRep` (weak Republican), and `strRep` (strong republican). In this analysis we only consider the coarsened categories: `Democratic`, `Independent`, and `Republican`.
+
+```{r}
+nes96 <- nes96 %>%
+  mutate(sPID = recode(PID, 
+                       strDem  = "Democrat", 
+                       weakDem = "Democrat", 
+                       indDem  = "Independent", 
+                       indind  = "Independent", 
+                       indRep  = "Independent", 
+                       weakRep = "Republican", 
+                       strRep  = "Republican"))
+summary(nes96$sPID)
+```
+
+- The income variable in the original data was an ordered factor with income ranges. We convert this to a numeric variable by taking the midpoint of each range. 
+
+```{r}
+table(nes96$income)
+inca <- c(1.5, 4, 6, 8, 9.5, 10.5, 11.5, 12.5, 13.5, 
+          14.5, 16, 18.5, 21, 23.5, 27.5, 32.5, 37.5, 
+          42.5, 47.5, 55, 67.5, 82.5, 97.5, 115)
+nes96 <- nes96 %>%
+  mutate(nincome = inca[unclass(income)])
+summary(nes96$nincome)
+```
+
+- Graphical summaries.
+
+How does party identification changes with education level?
+```{r}
+nes96 %>%
+  count(educ, sPID) %>%
+  group_by(educ) %>%
+  mutate(prop = prop.table(n)) %>%
+  print(width = Inf) %>%
+  ggplot() +
+  geom_line(mapping = aes(x = educ, y = prop, group = sPID, color = sPID)) + 
+  scale_color_manual(values = c("blue", "green", "red")) + 
+  labs(x = "Education", y = "Proportion")
+```
+
+How does party identification changes with income level?
+```{r}
+nes96 %>%
+  count(income, sPID) %>%
+  group_by(income) %>%
+  mutate(prop = prop.table(n)) %>%
+  print(width = Inf) %>%
+  ggplot() +
+  geom_line(mapping = aes(x = income, y = prop, group = sPID, color = sPID)) + 
+  scale_color_manual(values = c("blue", "green", "red")) + 
+  labs(x = "Income", y = "Proportion") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+How does party identification changes with age?
+```{r}
+nes96 %>%
+  mutate(age_grp = cut(age, breaks = seq(from = 10, to = 100, by = 10))) %>%
+  count(age_grp, sPID) %>%
+  group_by(age_grp) %>%
+  mutate(prop = prop.table(n)) %>%
+  print(width = Inf) %>%
+  ggplot() +
+  geom_line(mapping = aes(x = age_grp, y = prop, group = sPID, color = sPID)) + 
+  scale_color_manual(values = c("blue", "green", "red")) + 
+  labs(x = "Age", y = "Proportion") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+### Fit multinomial-logit
+
+- To verify that the trends observed in these graphs are statistical significant, we need a formal model.  The `multinom` function is avaible in the `nnet` package.
+```{r}
+library(nnet)
+mmod <- multinom(sPID ~ age + educ + nincome, data = nes96)
+summary(mmod)
+```
+
+- We can select which variables to include in the model based the AIC criterion using a stepwise search method.
+```{r}
+step(mmod)
+```
+
+- Or we can use the standard likelihood methods to derive a test to compare nested models. For example, we can fit a model with predictor `nincome` only and then compare the deviances.
+```{r}
+mmodi <- multinom(sPID ~ nincome, data = nes96)
+deviance(mmodi) - deviance(mmod)
+mmod$edf - mmodi$edf
+pchisq(deviance(mmodi) - deviance(mmod), mmod$edf - mmodi$edf, lower = F)
+```
+
+- To interpret the coefficients:
+```{r}
+summary(mmodi)
+```
+
+    
+  - The intercept terms model the probabilities of party identification when income is zero.
+```{r}
+cc <- c(0, -1.17493, -0.95036)
+exp(cc) / sum(exp(cc))
+```
+    
+  - The slope terms represent the log-odds of moving from the baseline category `Democrat` to `Independent` and `Republican` respectively for a unit change of $1000 in income. 
+```{r}
+(pp <- predict(mmodi, data.frame(nincome = c(0, 1)), type = "probs"))
+log(pp[1, 1] * pp[2, 2] / (pp[1, 2] * pp[2, 1]))
+log(pp[1, 1] * pp[2, 3] / (pp[1, 3] * pp[2, 1]))
+```
+
+- We can obtain predicted values for specified values of income.
+```{r}
+il <- c(8, 26, 42, 58, 74, 90, 107)
+predict(mmodi, data.frame(nincome = il), type = "probs") %>%
+  as_tibble() %>%
+  mutate(income = il) %>%
+  pivot_longer(Democrat:Republican, names_to = "sPID", values_to = "prob") %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = income, y = prob, group = sPID, color = sPID)) +
+  scale_color_manual(values = c("blue", "green", "red")) + 
+  labs(x = "Income", y = "Probability")
+```
+
+## Hierarchical or nested responses
+
+- Consider following data concerning live births with deformations of the central nervous system (CNS) in south Wales.
+```{r}
+(cns <- as_tibble(cns))
+```
+
+- Responses:  
+    * NoCNS: no CNS   
+    * An: anencephalus   
+    * Sp: sina bifida   
+    * Other: other malformations 
+
+- Predictors:  
+    * Water: water hardness   
+    * Work: type of work performed by the parents  
+
+- We might consider a multinomial response with four categories. However, we can see that most births suffer no malformation and so this category dominates the other three. It is better to consider this as a hierarchical response. Consider the multinomial likelihood for the $i$-th observation which is proportional to:
+$$
+  p_{i1}^{y_{i1}} p_{i2}^{y_{i2}} p_{i3}^{y_{i3}} p_{i4}^{y_{i4}}
+$$
+Define $p_{ic} = p_{i2} + p_{i3} + p_{i4}$ which is the probability of a birth with some kind of CNS malformation. We can then write the likelihood as
+$$
+  p_{i1}^{y_{i1}} p_{ic}^{y_{i2} + y_{i3} + y_{i4}} \times \left( \frac{p_{i2}}{p_{ic}} \right)^{y_{i2}} \left( \frac{p_{i3}}{p_{ic}} \right)^{y_{i3}} \left( \frac{p_{i4}}{p_{ic}} \right)^{y_{i4}}
+$$
+We can now separatly develop a binomial model for whether malformation occurs and a multinomial model for the type of malformation. 
+
+## Ordinal multinomial responses
+
+- Suppose we have $J$ ordered categories and $p_{ij} = \mathbb{P}(Y_i = j)$ for $j=1, \ldots, J$. For ordered responses, it is more convenient to work with the cumulative probabilities
+$$
+  \gamma_{ij} = \mathbb{P}(Y_i \le j).
+$$
+Since $\gamma_{iJ}=1$, we only need to model $J-1$ cumulative probabilities. 
+
+- To link $\gamma$s to covariats $x$, we consider
+$$
+  g(\gamma_{ij}) = \theta_j - \mathbf{x}_i^T \boldsymbol{\beta},
+$$
+where $\theta_j$ have to be non-decreasing in $j$ to honor the ordering. In other words, $\boldsymbol{\beta}$ has a uniform effect on the response categories and each category has its own intercept. Again we have at least 3 choices for the link function: logit, probit or cloglog. 
+- Latent variable interpretation.
+
+```{r}
+theta <- c(-2, -1, 2)
+tibble(t = seq(-6, 6, 0.1), pdf = dlogis(t, location = 0, scale = 1)) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = t, y = pdf)) + 
+  geom_segment(mapping = aes(x = theta[1], y = 0, xend = theta[1], yend = dlogis(theta[1]))) + 
+  geom_segment(mapping = aes(x = theta[2], y = 0, xend = theta[2], yend = dlogis(theta[2]))) + 
+  geom_segment(mapping = aes(x = theta[3], y = 0, xend = theta[3], yend = dlogis(theta[3]))) +
+  labs(x = "t", y = "Density") + 
+  annotate("text", x = theta[1], y = 0, label = expression(theta[1])) + 
+  annotate("text", x = theta[2], y = 0, label = expression(theta[2])) + 
+  annotate("text", x = theta[3], y = 0, label = expression(theta[3]))
+```
+
+### Proportional odds model
+
+- The logit link function dictates
+$$
+  \log \frac{\gamma_{ij}}{1 - \gamma_{ij}} = \theta_j - \mathbf{x}_i^T \boldsymbol{\beta}, \quad j = 1,\ldots,J-1.
+$$
+
+- The corresponding inverse link function is
+$$
+  \gamma_{ij} = \frac{\exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}{1 + \exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}.
+$$
+When $\beta_j > 0$, as $x_{ij}$ increases, $\gamma_{ij} = \mathbb{P}(Y_i \le j)$ decreases the same amount for all $j < J$, thus $Y_i$ is more likely to take the largest value $J$. This motivates the minus sign in the definition of the model since it allows easier interpretation of $\beta$.
+
+- It is called the **proportional odds model** because the relative odds for $y \le j$ comparing $\mathbf{x}_1$ and $\mathbf{x}_2$ are
+$$
+  \left( \frac{\gamma_j(\mathbf{x}_1)}{1 - \gamma_j(\mathbf{x}_1)} \right) / \left( \frac{\gamma_j(\mathbf{x}_2)}{1 - \gamma_j(\mathbf{x}_2)} \right) = \exp (- (\mathbf{x}_1 - \mathbf{x}_2)^T \boldsymbol{\beta}),
+$$
+which do not dependent on $j$. Here $\gamma_j(\mathbf{x}_i) = \gamma_{ij}$.
+
+- We can fit a proportional odds model using the `polr` function from the MASS library
+```{r}
+library(MASS)
+pomod <- polr(sPID ~ age + educ + nincome, data = nes96)
+summary(pomod)
+```
+
+- Stepwise regression leads to a model with only one predictor `nincome`.
+```{r}
+pomodi <- step(pomod)
+summary(pomodi)
+```
+
+- Analysis of deviance also justifies the model with only `nincome`.
+```{r}
+c(deviance(pomodi), pomodi$edf)
+```
+which can be compared to the corresponding multinomial logit model
+```{r}
+c(deviance(pomod), pomod$edf)
+```
+We see the proportional odds model is justifiable.
+```{r}
+pchisq(deviance(pomodi) - deviance(pomod), 
+       pomod$edf - pomodi$edf, 
+       lower.tail = FALSE)
+```
+
+- Interpretation of coefficients. 
+
+    - The odds of moving from `Democratic` to `Independent` or from `Independent` to `Republican` increases by a factor of 
+    ```{r} 
+    exp(pomodi$coef[1])
+    ```
+    as income increases by one unit ($1000). 
+    
+    - For income of $0, the predicted probability of being a `Democrat` is
+    ```{r}
+    ilogit(pomodi$zeta[1])
+    ```
+    and that of being an `Independent` is
+    ```{r}
+    ilogit(pomodi$zeta[2]) - ilogit(pomodi$zeta[1])
+    ```
+    and that of being a `Republican` is
+    ```{r}
+    1 - ilogit(pomodi$zeta[2])
+    ```
+
+- The predicted probabilities of each category at each income level is
+```{r}
+l <- c(8, 26, 42, 58, 74, 90, 107)
+predict(pomodi, data.frame(nincome = il), type = "probs")
+```
+
+### Ordered probit model
+
+- If we use the probit link, then
+$$
+  \Phi^{-1}(\gamma_j(\mathbf{x}_i)) = \theta_j - \mathbf{x}_i^T \boldsymbol{\beta}, \quad j=1,\ldots,J-1.
+$$
+```{r}
+opmod <- polr(sPID ~ nincome, method = "probit", data = nes96)
+summary(opmod)
+```
+
+- The deviance is similar to the logit link, but the coefficients appear to be different. The predictions are similar.
+```{r}
+l <- c(8, 26, 42, 58, 74, 90, 107)
+predict(opmod, data.frame(nincome = il), type = "probs")
+```
+
+### Proportional hazards model
+
+- Suppose we use the cloglog link
+$$
+  \log (- \log (1 - \gamma_j(\mathbf{x}_i))) = \theta_j - \mathbf{x}_i^T \boldsymbol{\beta}.
+$$
+
+- The **hazard** of category $j$ is the probability of falling in category $j$ given that your category is greater than $j$
+$$
+  \text{Hazard}(j) = \mathbb{P}(Y_i = j \mid Y_i \ge j) = \frac{\mathbb{P}(Y_i = j)}{\mathbb{P}(Y_i \ge j)} = \frac{\gamma_{ij} - \gamma_{i,j-1}}{1 - \gamma_{i,j-1}}.
+$$
+The quantity $- \log \mathbb{P}(Y > j)$ is called the cumulative hazard function. 
+
+- Since 
+\begin{eqnarray*}
+1 - \gamma_j(\mathbf{x}) &=& \mathbb{P}(Y > j) = e^{- e^{\theta_j - \mathbf{x}^T \boldsymbol{\beta}}},
+\end{eqnarray*}
+we have
+\begin{eqnarray*}
+\log \mathbb{P}(Y > j) = - e^{\theta_j - \mathbf{x}^T \boldsymbol{\beta}}
+\end{eqnarray*}
+and
+$$
+\frac{- \log \mathbb{P}(Y > j \mid \mathbf{x}_1)}{- \log \mathbb{P}(Y > j \mid \mathbf{x}_2)} = e^{(\mathbf{x}_2 - \mathbf{x}_1)^T \boldsymbol{\beta}}
+$$
+or
+$$
+  \mathbb{P}(Y > j \mid \mathbf{x}_1) = [\mathbb{P}(Y > j \mid \mathbf{x}_2)]^{\exp (\mathbf{x}_2 - \mathbf{x}_1)^T \boldsymbol{\beta}}.
+$$
+It is called the **proportional hazards model** because the ratio of cumulative hazards does not depend on level $j$.
+
+```{r}
+polr(sPID ~ nincome, method = "cloglog", data = nes96)
+```
+We see a relatively worse fit than proportional odds and ordered probit models.
