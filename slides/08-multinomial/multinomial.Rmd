@@ -1,7 +1,7 @@
 ---
 title: "Multinomial Data (ELMR Chapter 7)"
 author: "Dr. Jin Zhou @ UCLA"
-date: "Apr 27, 2023"
+date: "May 2, 2023"
 output:
   # ioslides_presentation: default
   html_document:
@@ -205,7 +205,68 @@ Define $p_{ic} = p_{i2} + p_{i3} + p_{i4}$ which is the probability of a birth w
 $$
   p_{i1}^{y_{i1}} p_{ic}^{y_{i2} + y_{i3} + y_{i4}} \times \left( \frac{p_{i2}}{p_{ic}} \right)^{y_{i2}} \left( \frac{p_{i3}}{p_{ic}} \right)^{y_{i3}} \left( \frac{p_{i4}}{p_{ic}} \right)^{y_{i4}}
 $$
-We can now separatly develop a binomial model for whether malformation occurs and a multinomial model for the type of malformation. 
+We can now separately develop a binomial model for whether malformation occurs and a multinomial model for the type of malformation. 
+
+```{r}
+cns %>% 
+  mutate(CNS = An + Sp + Other) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = Water, y = log(CNS/NoCNS), color = Work), size = 5) +
+  labs(x = "Water", y = "log(CNS/NoCNS") 
+```
+We observe that the proportion of CNS births falls with increasing water hardness and is higher for manual workers. 
+
+
+```{r}
+cns <- cns %>% 
+  mutate(CNS = An + Sp + Other)
+binmodw <- glm(cbind(CNS, NoCNS) ~ Water + Work , cns, family = binomial)
+binmoda <- glm(cbind(CNS,NoCNS) ~ Water, cns, family=binomial)
+anova(binmodw, binmoda, test = "Chi")
+#halfnorm(hatvalues(binmodw))
+#cns %>% slice(10)
+```
+```{r}
+sumary(binmodw)
+```
+The residual deviance is close to the degrees of freedom indicating a reasonable fit to the data. We see that since: exp(-0.339058)=`r exp(-0.339058)`,
+births to nonmanual workers have a 29% lower chance of CNS malformation. Water hardness ranges from about 40 to 160. So a difference of 120 would decrease the odds of CNS malformation by about 32% (i.e., 1-exp(-0.0032644*120).
+
+- Now consider a multinomial model for the three malformation types conditional on a malformation having occurred. 
+```{r}
+cmmod <- multinom(cbind(An, Sp, Other) ~ Water + Work, cns)
+```
+
+- We find that neither predictor has much effect:
+```{r}
+nmod <- step(cmmod)
+```
+
+which leaves us with a null final model:
+```{r}
+nmod
+```
+
+
+The fitted proportions are:
+```{r}
+cc <- c(0,0.28963,-0.98083)
+names(cc) <- c("An","Sp","Other")
+exp(cc)/sum(exp(cc))
+```
+So we find that water hardness and parents’ professions are related to the probability of a malformed birth, but that they have no effect on the type of malformation.
+
+- If we fit a multinomial logit model to all four categories:
+```{r}
+mmmod <- multinom(cbind(NoCNS,An,Sp,Other) ~ Water + Work, cns)
+sum_mmmod <- summary(mmmod)
+
+z <- sum_mmmod$coefficients/sum_mmmod$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1))*2
+p
+```
+We find that both Water and Work are significant, but that the fact that they do not distinguish the type of malformation is not easily discovered from this model.
+
 
 ## Ordinal multinomial responses
 
@@ -220,7 +281,20 @@ $$
   g(\gamma_{ij}) = \theta_j - \mathbf{x}_i^T \boldsymbol{\beta},
 $$
 where $\theta_j$ have to be non-decreasing in $j$ to honor the ordering. In other words, $\boldsymbol{\beta}$ has a uniform effect on the response categories and each category has its own intercept. Again we have at least 3 choices for the link function: logit, probit or cloglog. 
+
 - Latent variable interpretation.
+
+  + Suppose that $Z_i$ is some unobserved continuous variable that might be thought of as the real underlying latent response. We only observe a discretized version of $Z_i$ in the form of $Y_i$ where $Y_i = j$ is observed if $\theta_{j−1} < Z_i ≤ \theta_j$. Further suppose that $Z_i − \beta^T xi$ has distribution $F$, then:
+$$
+P(Y_i\leq j) = P(Z_i\leq \theta_j) = P(Z_i-\beta^Tx_i \leq \theta_j -\beta^Tx_i) = F(\theta_j-\beta^Tx_i) 
+$$
+    
+   + Now if, for example, F follows the logistic distribution, where $F(x) = e^x/(1+e^x)$, then:
+
+$$
+\gamma_{ij} = \frac{\text{exp}(\theta_j-\beta^Tx_i)}{1+\text{exp}(\theta_j-\beta^Tx_i)}
+$$
+        and so we would have a logit model for the cumulative probabilities $\gamma_{ij}$. Choosing the normal distribution for the latent          variable leads to a probit model, while the choice of an extreme value distribution leads to the complementary log-log. This latent         variable explanation for the model is displayed as the following figure. 
 
 ```{r}
 theta <- c(-2, -1, 2)
@@ -236,6 +310,7 @@ tibble(t = seq(-6, 6, 0.1), pdf = dlogis(t, location = 0, scale = 1)) %>%
   annotate("text", x = theta[3], y = 0, label = expression(theta[3]))
 ```
 
+
 ### Proportional odds model
 
 - The logit link function dictates
@@ -245,9 +320,15 @@ $$
 
 - The corresponding inverse link function is
 $$
-  \gamma_{ij} = \frac{\exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}{1 + \exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}.
+  \gamma_{ij} = \mathbb{P}(Y_i \le j)= \frac{\exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}{1 + \exp (\theta_j - \mathbf{x}_i^T \boldsymbol{\beta})}.
 $$
+
+
+
 When $\beta_j > 0$, as $x_{ij}$ increases, $\gamma_{ij} = \mathbb{P}(Y_i \le j)$ decreases the same amount for all $j < J$, thus $Y_i$ is more likely to take the largest value $J$. This motivates the minus sign in the definition of the model since it allows easier interpretation of $\beta$.
+
+![](./OrdinalLatentVariable.png)
+
 
 - It is called the **proportional odds model** because the relative odds for $y \le j$ comparing $\mathbf{x}_1$ and $\mathbf{x}_2$ are
 $$
@@ -310,6 +391,29 @@ l <- c(8, 26, 42, 58, 74, 90, 107)
 predict(pomodi, data.frame(nincome = il), type = "probs")
 ```
 
+```{r, warning=FALSE}
+library(ggeffects)
+plot <- ggpredict(pomodi, "nincome")
+ggplot(plot, 
+       aes(x = x, y = predicted, group = response.level, color = response.level)) + 
+  geom_line() +
+  xlab("income")
+```
+
+```{r}
+tibble(x = seq(-4, 4, by = 0.05),
+       y = dlogis(x)) %>%
+  ggplot() +
+  geom_line(aes(x = x, y = y)) + 
+  geom_vline(xintercept = c(0.209, 1.292)) + 
+  geom_vline(xintercept = c(0.209,1.292) - 50*0.013120, linetype = "dotted") +
+  geom_vline(xintercept = c(0.209,1.292) -100*0.013120, linetype = "longdash") + 
+  labs(y = "dlogis(x)")
+```
+
+- The probability of being a Democrat is given by the area lying to the left of the leftmost of each pair of lines, while the probability of being a Republican is given by the area to the right of the rightmost of the pair. Independents are represented by the area in-between.
+
+
 ### Ordered probit model
 
 - If we use the probit link, then
@@ -326,6 +430,9 @@ summary(opmod)
 l <- c(8, 26, 42, 58, 74, 90, 107)
 predict(opmod, data.frame(nincome = il), type = "probs")
 ```
+
+
+
 
 ### Proportional hazards model
 
