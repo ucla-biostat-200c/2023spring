@@ -361,7 +361,7 @@ glm(y ~ smoker * age + dead * age, family = poisson, data = femsmoke) %>%
 
 ### Uniform association
 
-- If we conisder a model with all two-way interactions
+- If we consider a model with all two-way interactions
 $$
 \log \mathbb{E}Y_{ijk} = \log n + \log p_i + \log p_j + \log p_k + \log p_{ij} + \log p_{ik} + \log p_{jk}.
 $$

@@ -50,7 +50,16 @@ Show $\mathbb{E}Y = \mu = rp / (1 - p)$ and $\operatorname{Var} Y = r p / (1 - p
 
 ## Q3. ELMR Chapter 5 Exercise 5 (page 100)
 
+## Q4. Uniform association 
 
+For the uniform association when all two-way interactions are included, i.e., 
+$$
+\log \mathbb{E}Y_{ijk} = \log p_{ijk} = \log n + \log p_i + \log p_j + \log p_k + \log p_{ij} + \log p_{ik} + \log p_{jk}.
+$$
 
+Proof the odds ratio (or log of odds ratio) across all stratum $k$ 
+$$
+\log \frac{\mathbb{E}Y_{11k}\mathbb{E}Y_{22k}}{\mathbb{E}Y_{12k}\mathbb{E}Y_{21k}}
+$$
 
-
+is a constant, i.e., the estimated effect of the interaction term "i:j" in the uniform association model 
