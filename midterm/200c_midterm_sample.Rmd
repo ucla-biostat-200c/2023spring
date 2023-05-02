@@ -1,0 +1,61 @@
+---
+title: "Biostat 200C Midterm"
+author: "FirstName LastName (UID XXX-XXX-XXX)"
+subtitle: May 16, 2023 @ 10am-11:50pm
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(tidyverse)
+library(faraway)
+library(survival)
+```
+
+It is an close book test. Read the [Academic Integrity section](https://ucla-biostat-200c-2023spring.github.io/syllabus/syllabus.html) of the syllabus. 
+
+## Q1. (5 pts) True or false
+
+| No. | | | Statement |
+|:-|:-|:-|:------------------------|
+| 1. | T | F | We can use the logistic model whenever all the independent variables in the model are continuous. |  
+| 2. | T | F | The range of the logistic function lies between 0 and 1. |  
+| 3. | T | F | The logistic model describes the probability of disease development, e.g., risk for the disease, for a given set of independent variables. |  
+| 4. | T | F | The logistic model can only be applied to analyze a prospective (or follow-up) study. |  
+| 5. | T | F | In prospective (follow-up) studies, we can use a fitted logistic model to estimate a risk ratio comparing two groups whenever all the independent variables in the model are specified for both groups. |
+
+## Q2. (20 pts) Bernoulli model
+
+Following table lists the coefficients of a fitted logistic regression. The outcome is HPT (hypertension, binary $\{0, 1\}$). 
+
+| Variable | Type | Coefficient |  
+|:-----|:-----|-----:|   
+| INTERCEPT | | -4.3200 |   
+| AGE | continuous | 0.0274 |  
+| SMK | binary, $\{0,1\}$ | 0.5859 |  
+| SEX | binary, $\{0,1\}$ | 1.1523 |  
+| CHOL | cholesterol, continuous | 0.0087 |  
+| OCC | occupation, $\{0,1\}$ | -0.5309 | 
+
+1. Write down the logistic model that was fit to the data, in terms of the unknown population parameters and the predictors being considered. 
+
+2. Write down the _estimated_ logistic model, in terms of the fitted coefficients.   
+
+3. Write down the _estimated_ logistic model in logit form.  
+
+4. Assuming the study design used was a prospective (follow-up) design, compute the estimated risk for a 40-years-old, male (SEX=1) smoker (SMK=1) with CHOL=200 and OCC=1. 
+
+5. Again assuming a prospective (follow-up) design, compute the estimated risk for a 40-years-old, male (SEX=1) nonsmoker (SMK=0) with CHOL=200 and OCC=1.
+
+6. Compute and interpret the estimated risk ratio (or relative risk) that compares the risk of a 40-year-old male smoker to a 40-year-old male nonsmoker, both of whom have CHOL=200 and OCC=1.  
+
+7. Would the risk ratio computation in the last question be appropriate if the study design had been retrospective (case-control)? Explain.  
+
+8. Compute and interpret the estimated odds ratio for the effect of SMK controlling for AGE, SEX, CHOL and OCC. 
+
+9. What assumption will allow us to conclude that the estimate obtained in the last question is approximately a risk ratio estimate? 
+
+10. Compute and interpret the estimated odds ratio for the effect of OCC controlling for AGE, SMK, SEX, and CHOL. 
