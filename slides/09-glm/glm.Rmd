@@ -117,7 +117,7 @@ Exponential family distributions have mean and variance
   \mathbb{E}Y &=& \mu = b'(\theta) \\
   \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
 \end{eqnarray*}
-**Show this in HW3**. Thus the function $b$ determines the moments of $Y$.
+**Show this in HW4**. Thus the function $b$ determines the moments of $Y$.
 
 ## Link function
 
