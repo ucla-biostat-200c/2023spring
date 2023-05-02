@@ -15,7 +15,7 @@ library(faraway)
 library(survival)
 ```
 
-It is an close book test. Read the [Academic Integrity section](https://ucla-biostat-200c-2023spring.github.io/syllabus/syllabus.html) of the syllabus. 
+It is a close book test. Read the [Academic Integrity section](https://ucla-biostat-200c-2023spring.github.io/syllabus/syllabus.html) of the syllabus. 
 
 ## Q1. (5 pts) True or false
 
