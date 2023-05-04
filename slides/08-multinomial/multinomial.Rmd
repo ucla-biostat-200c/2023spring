@@ -284,9 +284,9 @@ where $\theta_j$ have to be non-decreasing in $j$ to honor the ordering. In othe
 
 - Latent variable interpretation.
 
-  + Suppose that $Z_i$ is some unobserved continuous variable that might be thought of as the real underlying latent response. We only observe a discretized version of $Z_i$ in the form of $Y_i$ where $Y_i = j$ is observed if $\theta_{j−1} < Z_i ≤ \theta_j$. Further suppose that $Z_i − \beta^T xi$ has distribution $F$, then:
+  + Suppose that $Z_i$ is some unobserved continuous variable that might be thought of as the real underlying latent response. We only observe a discretized version of $Z_i$ in the form of $Y_i$ where $Y_i = j$ is observed if $\theta_{j−1} < Z_i ≤ \theta_j$. Further suppose that $Z_i − \beta^T x_i$ has distribution $F$, then:
 $$
-P(Y_i\leq j) = P(Z_i\leq \theta_j) = P(Z_i-\beta^Tx_i \leq \theta_j -\beta^Tx_i) = F(\theta_j-\beta^Tx_i) 
+\gamma_{ij} = P(Y_i\leq j) = P(Z_i\leq \theta_j) = P(Z_i-\beta^Tx_i \leq \theta_j -\beta^Tx_i) = F(\theta_j-\beta^Tx_i) 
 $$
     
    + Now if, for example, F follows the logistic distribution, where $F(x) = e^x/(1+e^x)$, then:
