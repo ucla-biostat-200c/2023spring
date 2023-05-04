@@ -11,7 +11,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
 ```
 
-## Q1. Moments of exponential family distributions
+## Q1. ELMR Excercise 7.5 (p150)
+
+## Q2. Moments of exponential family distributions
 
 Show that the exponential family distributions have moments
 \begin{eqnarray*}
@@ -19,14 +21,12 @@ Show that the exponential family distributions have moments
   \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
 \end{eqnarray*}
 
-## Q2. Score and information matrix of GLM
+## Q3. Score and information matrix of GLM
 
 Derive the gradient (score), negative Hessian, and Fisher information matrix (expected negative Hessian) of GLM.
 
-## Q3. ELMR Excercise 7.5 (p150)
+## Q4. ELMR Exercise 8.1 (p171)
 
-## Q3. ELMR Exercise 8.1 (p171)
-
-## Q4. ELMR Exercise 8.4 (p172)
+## Q5. ELMR Exercise 8.4 (p172)
 
 ## Q5. ELMR Exercise 8.5 (p172)
