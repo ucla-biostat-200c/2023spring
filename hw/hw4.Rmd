@@ -29,4 +29,4 @@ Derive the gradient (score), negative Hessian, and Fisher information matrix (ex
 
 ## Q5. ELMR Exercise 8.4 (p172)
 
-## Q5. ELMR Exercise 8.5 (p172)
+## Q6. ELMR Exercise 8.5 (p172)
