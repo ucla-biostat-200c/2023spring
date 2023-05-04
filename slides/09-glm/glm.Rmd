@@ -149,12 +149,11 @@ $$
 | Inverse Gaussian | $\eta = \mu^{-2}$             | $\mu^3$           |
 
 ## Fisher scoring algorithm and IRWLS
-
 - GLM regreesion coefficients are estimated by MLE. Recall that the Newton-Raphson algorithm for maximizing a log-likelihood $\ell(\boldsymbol{\beta})$ proceeds as
 $$
   \boldsymbol{\beta}^{(t+1)} = \boldsymbol{\beta}^{(t)} + s [- \nabla^2 \ell(\boldsymbol{\beta}^{(t)})]^{-1} \nabla \ell(\boldsymbol{\beta}^{(t)}),
 $$
-where $s>0$ is a step length, $\nabla \ell$ is the **score (gradient) vector**, and $-\nabla^2 \ell$ is the **observed information matrix** (negative Hessian). 
+where $s>0$ is a step length, $\nabla \ell$ is the **score (gradient) vector**, and $-\nabla^2 \ell$ is the **observed information matrix** (negative Hessian). See Biostat 257 [lecture notes](https://ucla-biostat-257.github.io/2022spring/slides/23-newton/newton.html)
 
 - For GLM, 
 \begin{eqnarray*}
@@ -169,7 +168,7 @@ $$
 $$
 Therefore for canonical link the negative Hessian is positive semidefinte and Newton's algorithm with line search is stable. 
 
-    See Biostat 216 [lecture notes](https://ucla-biostat216-2019fall.github.io/slides/16-matrixcalc/16-matrixcalc.html) for a refresher of matrix calculus.
+    See Biostat 216 [lecture notes](https://ucla-biostat216-2019fall.github.io/slides/16-matrixcalc/16-matrixcalc.html) for a refresher of matrix calculus. 
 
 - How about non-canonical link? We use the expected (Fisher) information matrix
 $$

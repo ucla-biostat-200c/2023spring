@@ -1,0 +1,32 @@
+---
+title: "Biostat 200C Homework 4"
+subtitle: Due May 12  @ 11:59PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+
+## Q1. Moments of exponential family distributions
+
+Show that the exponential family distributions have moments
+\begin{eqnarray*}
+  \mathbb{E}Y &=& \mu = b'(\theta) \\
+  \operatorname{Var}Y &=& \sigma^2 = b''(\theta) a(\phi).
+\end{eqnarray*}
+
+## Q2. Score and information matrix of GLM
+
+Derive the gradient (score), negative Hessian, and Fisher information matrix (expected negative Hessian) of GLM.
+
+## Q3. ELMR Excercise 7.5 (p150)
+
+## Q3. ELMR Exercise 8.1 (p171)
+
+## Q4. ELMR Exercise 8.4 (p172)
+
+## Q5. ELMR Exercise 8.5 (p172)
