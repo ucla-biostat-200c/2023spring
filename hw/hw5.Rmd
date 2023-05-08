@@ -1,0 +1,61 @@
+---
+title: "Biostat 200C Homework 5"
+subtitle: Due June 2  @ 11:59PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+```
+## Q1. Balanced one-way ANOVA random effects model
+
+Consider the balanced one-way ANOVA random effects model with $a$ levels and $n$ observations in each level
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \quad i=1,\ldots,a, \quad j=1,\ldots,n.
+$$
+where $\alpha_i$ are iid from $N(0,\sigma_\alpha^2)$, $\epsilon_{ij}$ are iid from $N(0, \sigma_\epsilon^2)$. 
+
+1. Derive the ANOVA estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. Specifically show that
+\begin{eqnarray*}
+  \mathbb{E}(\bar y_{\cdot \cdot}) &=& \mathbb{E} \left( \frac{\sum_{ij} y_{ij}}{na} \right) = \mu \\
+  \mathbb{E} (\text{SSE}) &=& \mathbb{E} \left[ \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{i \cdot})^2 \right] = a(n-1) \sigma_{\epsilon}^2 \\
+  \mathbb{E} (\text{SSA}) &=& \mathbb{E} \left[ \sum_{i=1}^a \sum_{j=1}^n (\bar{y}_{i \cdot} - \bar{y}_{\cdot \cdot})^2 \right] = (a-1)(n \sigma_{\alpha}^2 + \sigma_{\epsilon}^2),
+\end{eqnarray*}
+which can be solved to obtain ANOVA estimate
+\begin{eqnarray*}
+\widehat{\mu} &=& \frac{\sum_{ij} y_{ij}}{na}, \\
+\widehat{\sigma}_{\epsilon}^2 &=& \frac{\text{SSE}}{a(n-1)}, \\
+\widehat{\sigma}_{\alpha}^2 &=& \frac{\text{SSA}/(a-1) - \widehat{\sigma}_{\epsilon}^2}{n}.
+\end{eqnarray*}
+
+2. Derive the MLE estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. Hint: write down the log-likelihood and find the maximizer.
+
+3. (**Optional**) Derive the REML estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. 
+
+4. For all three estimates, check that your results match those we obtained using R for the `pulp` example in class.
+
+## Q2. Estimation of random effects
+
+1. Assume the conditional distribution
+$$
+\mathbf{y} \mid \boldsymbol{\gamma} \sim N(\mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma}, \sigma^2 \mathbf{I}_n)
+$$
+and the prior distribution
+$$
+\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma}).
+$$
+Then by the Bayes theorem, the posterior distribution is
+\begin{eqnarray*}
+f(\boldsymbol{\gamma} \mid \mathbf{y}) &=& \frac{f(\mathbf{y} \mid \boldsymbol{\gamma}) \times f(\boldsymbol{\gamma})}{f(\mathbf{y})}, \end{eqnarray*}
+where $f$ denotes corresponding density. Show that the posterior distribution is a multivariate normal with mean
+$$
+\mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma} \mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
+$$
+
+2. For the balanced one-way ANOVA random effects model, show that the posterior mean of random effects is always a constant (less than 1) multiplying the corresponding fixed effects estimate.
+
+
+## Q3. ELMR Exercise 11.1 (p251)
