@@ -1,7 +1,7 @@
 ---
 title: "Random Effects (ELMR Chapter 10)"
-author: "Dr. Hua Zhou @ UCLA"
-date: "May 5, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "May 9, 2023"
 output:
   # ioslides_presentation: default
   html_document:
