@@ -1,0 +1,490 @@
+---
+title: "Random Effects (ELMR Chapter 10)"
+author: "Dr. Hua Zhou @ UCLA"
+date: "May 5, 2020"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = TRUE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+
+## Introduction
+
+- The `pulp` data set contains data from an experiment to test the paper brightness depending on a shift operator. 
+```{r}
+pulp <- as_tibble(pulp) %>%
+  print(n = Inf)
+```
+Graphical summary:
+```{r}
+pulp %>%
+  ggplot(mapping = aes(x = operator, y = bright)) + 
+  geom_jitter(width=0.1, height=0.0) + 
+  labs(x = "Operator", y = "Bright")
+```
+
+- Research question is whether there is any difference in the paper brightness produced by different shift operators. 
+
+- We can answer the question using the classical ANOVA (analysis of variance)
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \quad i = 1,\ldots,4, j = 1,\ldots,5,
+$$
+where $\epsilon_{ij}$ are assumed to be iid $N(0,\sigma^2)$.
+
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+lmod <- lm(bright ~ operator, data = pulp)
+summary(lmod)
+```
+The contrast `contr.sum` forces the coefficients for 4 operators sum to 0 (when using the dummy/one-hot coding). So the coeffiicient for the 4th operator is `r -sum(coef(lmod)[2:4])`.
+```{r}
+model.matrix(lmod)
+```
+The factor `operator` is significant with p-value 0.023.
+```{r}
+anova(lmod, test = "F")
+```
+
+- The hypothesis being tested in the ANOVA is _are these four operators same_ in terms of the paper brightness they produce. This is called a **fixed effects model** because the effects $\alpha_i$ are assumed to be fixed. 
+
+- Suppose we are interested in the research question _are the population of operators all same_ based on this data set? We will arrive a random effects model
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \quad i = 1,\ldots,4, j = 1,\ldots,5,
+$$
+where we assume
+    - $\alpha_i$ are iid from $N(0, \sigma_{\alpha}^2)$,  
+    - $\epsilon_{ij}$ are iid $N(0,\sigma_{\epsilon}^2)$, and   
+    - $\alpha_i$ and $\epsilon_{ij}$ are jointly independent.  
+
+    This is called a **random effects model** because now the effects $\alpha_i$ are assumed to be random. The parameters in this random effects model are $\mu$, $\sigma_\alpha^2$, and $\sigma_\epsilon^2$. The latter two are also called the variance component parameters. To test the research hypothesis, we would test $H_0: \sigma_\alpha^2=0$.
+
+- Differences between a fixed effects model and a random effects model.  
+    1. the interpretation is different,  
+    2. random effects model can be more parsimonious (less parameters) than the corresponding fixed effects model,  
+    3. observations in random effects model are correlated.
+
+- In this chapter, we study estimation and inference for mixed effects models.
+
+## Mixed effects model
+
+- Traditionally, linear models can be divided into three categories:
+
+    1. Fixed effects model: $\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}$, where $\boldsymbol{\beta}$ is fixed.
+    
+    2. Random effects model: $\mathbf{y} = \mathbf{Z} \boldsymbol{\gamma} + \boldsymbol{\epsilon}$, where $\boldsymbol{\gamma}$ is random.
+    
+    3. Mixed effects model or mixed model: $\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma} + \boldsymbol{\epsilon}$, where $\boldsymbol{\beta}$ is fixed and $\boldsymbol{\gamma}$ is random.
+
+- In a mixed effects model
+\begin{eqnarray*}
+	\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma} + \boldsymbol{\epsilon}
+\end{eqnarray*}
+where 
+    - $\mathbf{X} \in \mathbb{R}^{n \times p}$ is a design matrix for fixed effects $\boldsymbol{\beta} \in \mathbb{R}^p$,
+
+    - $\mathbf{Z} \in \mathbb{R}^{n \times q}$ is a design matrix for random effects $\boldsymbol{\gamma} \in \mathbb{R}^q$,
+    
+    - The most common assumption is $\boldsymbol{\epsilon} \sim N(\mathbf{0}_n, \sigma^2 \mathbf{I})$, $\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma})$, and $\boldsymbol{\epsilon}$ is independent of $\boldsymbol{\gamma}$.
+
+- Primary goal of the mixed model (aka variance components model) is to  
+    - estimation and testing of the fixed effects $\boldsymbol{\beta}$,  
+    - estimation and testing of the variance component parameters, and  
+    - prediction.  
+
+## Example: one-way ANOVA 
+
+- For the one-way ANOVA random effects model with $a$ levels and $n_i$ observations in level $i$,
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \quad i=1,\ldots,a,
+$$
+we recognize it as a mixed effects model
+\begin{eqnarray*}
+\mathbf{y} = \mathbf{1}_{\sum_i n_i} \mu + \begin{pmatrix}
+\mathbf{1}_{n_1} & & \\
+& \vdots & \\
+& & \mathbf{1}_{n_a}
+\end{pmatrix} \boldsymbol{\gamma} + \boldsymbol{\epsilon},
+\end{eqnarray*}
+where $\boldsymbol{\gamma} = (\alpha_1, \ldots, \alpha_a)^T \sim N(\mathbf{0}_a, \sigma_{\alpha}^2 \mathbf{I}_a)$ and $\boldsymbol{\epsilon} \sim N(\mathbf{0}_{\sum_i n_i}, \sigma_{\epsilon}^2 \mathbf{I})$ are independent. Note in $\mathbf{Z}$ we have one column for each level. 
+
+- How do we estimate parameters $\mu$, $\sigma_{\alpha}^2$, and $\sigma_{\epsilon}^2$?
+
+## Estimation
+
+### ANOVA estimator
+
+- Consider the one-way ANOVA case. Assume we have a **balanced design**: $n_1 = \cdots = n_a = n$. That is each level has the same number of observations $n$. For example $n=5$ in the `pulp` example.
+
+- Because $\mathbb{E} Y_{ij} = \mu$. So we can estimate $\mu$ by average of $y_{ij}$
+```{r}
+mean(pulp$bright)
+```
+
+- To estimate the variance component parameters $\sigma_a^2$ and $\sigma_\epsilon^2$, the familiar ANOVA table gives the partition
+\begin{eqnarray*}
+\text{SST} &=& \text{SSE} + \text{SSA} \\
+\sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{\cdot \cdot})^2 &=& \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{i \cdot})^2 + \sum_{i=1}^a \sum_{j=1}^n (\bar{y}_{i \cdot} - \bar{y}_{\cdot \cdot})^2.
+\end{eqnarray*}
+Now we have (show in **HW4**)
+\begin{eqnarray*}
+\mathbb{E} (\text{SSE}) &=& a(n-1) \sigma_{\epsilon}^2 \\
+\mathbb{E} (\text{SSA}) &=& (a-1)(n \sigma_{\alpha}^2 + \sigma_{\epsilon}^2),
+\end{eqnarray*}
+which can be solved to obtain estimators
+\begin{eqnarray*}
+\widehat{\sigma}_{\epsilon}^2 &=& \frac{\text{SSE}}{a(n-1)} = \text{MSE}, \\
+\widehat{\sigma}_{\alpha}^2 &=& \frac{\text{SSA}/(a-1) - \widehat{\sigma}_{\epsilon}^2}{n} = \frac{\text{MSA} - \text{MSE}}{n}.
+\end{eqnarray*}
+
+- For the `pulp` data, the ANOVA table is
+```{r}
+(aovmod <- aov(bright ~ operator, data = pulp) %>%
+  summary())
+str(aovmod)
+```
+We estimate $\sigma_{\alpha}^2$ by
+```{r}
+(aovmod[1][[1]][[3]][1] - aovmod[1][[1]][[3]][2]) / 5
+```
+and $\sigma_{\epsilon}^2$ by
+```{r}
+aovmod[1][[1]][[3]][2]
+```
+
+- Drawbacks of ANOVA estimators.
+    1. When MSA<MSE, we obtain $\widehat{\sigma}_{\alpha}^2$.  
+    2. Hard to generalize to unbalanced ANOVA or more complicated designs. 
+    
+### Maximum likelihood estimation (MLE)
+
+- For the mixed effects model
+\begin{eqnarray*}
+	\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma} + \boldsymbol{\epsilon},
+\end{eqnarray*}
+where $\boldsymbol{\epsilon} \sim N(\mathbf{0}_n, \sigma^2 \mathbf{I})$ and $\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma})$ are independent of each other, we have
+$$
+\mathbf{Y} \sim N(\mathbf{X} \boldsymbol{\beta}, \mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I}).
+$$
+So the likelihood is
+$$
+\frac{1}{(2\pi)^{n/2} \det(\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{1/2}} e^{- \frac 12 (\mathbf{y} - \mathbf{X} \boldsymbol{\beta})^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta})}
+$$
+and the log-likelihood is
+$$
+\ell(\boldsymbol{\beta}, \boldsymbol{\Sigma}, \sigma^2) = - \frac n2 \log(2\pi) - \frac 12 \log \det (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I}) - \frac 12 (\mathbf{y} - \mathbf{X} \boldsymbol{\beta})^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
+$$
+- We can maximize the log-likelihood function to obtain MLE. 
+
+- **Exercise (HW4)**: Derive the MLE for the balanced one-way ANOVA example.
+
+- One drawback of MLE is that it produces biased estimate for the variance component parameters $\sigma^2$ and $\boldsymbol{\Sigma}$. E.g., in the linear regression case (fixed effects model), MLE for $\sigma^2$ is
+$$
+\widehat{\sigma}_{\text{MLE}}^2 = \frac{\text{RSS}}{n},
+$$
+where an unbiased estimator is 
+$$
+\widehat{\sigma}^2 = \frac{\text{RSS}}{n-p},
+$$
+where $p$ is the number of parameters. 
+
+- Let's find the MLE for the `pulp` data using `lme4` package. The syntax `(1 | operator)` instructs that the data is grouped by `operator` and the `1` indicates that random effect is constant within each group. The default method is REML so we set `REML = FALSE` to compute the MLE instead.
+
+```{r}
+library(lme4)
+
+smod <- lmer(bright ~ 1 + (1 | operator), data = pulp, REML = FALSE)
+summary(smod)
+```
+
+### Restricted MLE (REML)
+
+- The restricted maximum likelihood (REML) method tries to reduce the bias in variance component estimates. 
+
+- Assume $\mathbf{X}$ has full column rank $p$. Let $\mathbf{K} \in \mathbb{R}^{n \times (n-p)}$ be an basis of the space ${\cal N}(\mathbf{X}^T)$, which is orthogonal to ${\cal C}(\mathbf{X})$. Then
+$$
+\mathbf{K}^T \mathbf{Y} \sim N(\mathbf{0}_{n-p}, \mathbf{K}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I}) \mathbf{K}).
+$$
+We estimate variance component parameters $(\sigma^2, \boldsymbol{\Sigma})$ by MLE using this transformed data $(\mathbf{K}^T \mathbf{y}, \mathbf{K}^T \mathbf{Z})$. Then we estimate fixed effects $\boldsymbol{\beta}$ using general least squares. It can be shown that the REML estimate does not depend on the choice of $\mathbf{K}$.
+
+- Let's find the REML for the `pulp` data using `lme4`. 
+```{r}
+library(lme4)
+
+mmod <- lmer(bright ~ 1 + (1 | operator), data = pulp, REML = TRUE)
+summary(mmod)
+```
+We found the REML estimate is exactly same as ANOVA estimate. **Exercise (HW4)**: show this. 
+
+## Inference
+
+### LRT and adjusted F test for fixed effects
+
+- If we compare two nested models that differ only in fixed effects, we can use the standard likelihood ratio test (LRT). Remember we have to use MLE (not REML) for LRT.  
+
+- F tests for fixed effects need to use adjusted degrees of freedom (Kenward-Roger adjusted F-test for REML), as implemented in the `pbkrtest` package.
+
+### Parametric bootstrap
+
+- Testing the variance component parameters, e.g., $H_0:\sigma_{\alpha}^2=0$, can be hard because of the boundary condition (estimator has to be nonnegative). Conventional $\chi^2$ null distribution for LRT can be wrong. E.g., for the `pulp` data, LRT using the the conventional $\chi_1^2$ null distribution gives a non-significant p-value. 
+```{r}
+nullmod <- lm(bright ~ 1, data = pulp)
+(lrtstat <- as.numeric(2 * (logLik(smod, REML = FALSE) - logLik(nullmod))))
+# fishy result using LRT
+pchisq(lrtstat, 1, lower.tail = FALSE)
+```
+
+- The idea of parameteric bootstrap is we generate new $y$ from the fitted null model many times. For each simulation replicate, we calculate the LRT statistic. Then the p-value is estimated by the proportion of simulation replicates that generate LRT statistics larger than the observed one $2.5684$.
+
+```{r}
+B <- 1000
+lrstat <- numeric(B)
+set.seed(123) # for reproducibility
+for (i in 1:B) {
+  by <- unlist(simulate(nullmod))
+  bnull <- lm(by ~ 1)
+  #balt  <- refitML(smod, by)
+  balt  <- suppressMessages(lmer(by ~ 1 + (1 | operator), pulp, REML = FALSE))
+  lrstat[i] <- as.numeric(2 * (logLik(balt, REML = FALSE) - logLik(bnull)))
+}
+```
+Then the bootstrap p-value is
+```{r}
+# parametric bootstrap p-value
+(pval <- mean(lrstat > 2.5684))
+```
+with standard error
+```{r}
+sqrt(pval * (1 - pval) / B)
+```
+
+- Advantages of parametric boostrap:  
+    - It's not restricted to MLE estimators. It applies to many other estimators.  
+    - It does not rely on the dubious asymptotic $\chi^2$ distribution.  
+    - It can be used to generate confidence intervals.  
+    - It applies to inference of both $\boldsymbol{\beta}$ and variance component parameters.  
+    
+- Drawbacks of parametric bootstrap: computationally intensive. 
+
+### Exact LRT and RLRT test
+
+Another simulation based method is provided by the `RLRsim` package.
+```{r}
+library(RLRsim)
+
+exactLRT(smod, nullmod)
+exactRLRT(mmod)
+```
+
+## Estimate random effects
+
+- Consider the mixed effects model
+$$
+\begin{eqnarray*}
+	\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma} + \boldsymbol{\epsilon},
+\end{eqnarray*}
+$$
+where $\boldsymbol{\epsilon} \sim N(\mathbf{0}_n, \sigma^2 \mathbf{I})$ and $\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma})$ are independent of each other. The random effects $\boldsymbol{\gamma}$ are random variables. It does not make sense to estimate $\boldsymbol{\gamma}$. 
+
+- However, if we take the Bayesian point of view, we can estimate it by its posterior mean. We have a **likelihood**
+$$
+\mathbf{y} \mid \boldsymbol{\gamma} \sim N(\mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma}, \sigma^2 \mathbf{I}_n)
+$$
+and a **prior distribution**
+$$
+\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma}).
+$$
+Then by the Bayes theorem, the **posterior distribution** is
+\begin{eqnarray*}
+f(\boldsymbol{\gamma} \mid \mathbf{y}) &=& \frac{f(\mathbf{y} \mid \boldsymbol{\gamma}) \times f(\boldsymbol{\gamma})}{f(\mathbf{y})} \\
+&=& ...
+\end{eqnarray*}
+is a multivariate normal with mean (show in **HW4**)
+$$
+\mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma} \mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
+$$
+
+- We can use this posterior mean to estimate random effects. For the `pulp` data, estimate of random effects is obtained by
+```{r}
+ranef(mmod)$operator
+```
+Compare these to the coefficients from fixed effects model:
+```{r}
+(cc <- model.tables(aov(bright ~ operator, data = pulp)))
+```
+We found the estimated random effects are uniformly smaller than the fixed effects
+```{r}
+cc[[1]]$operator / ranef(mmod)$operator
+```
+That's why Bayesian estimates are often called the shrinkage estimator. **Exercise:** prove this in HW4 for the balanced one-way ANOVA example.
+
+## Prediction
+
+- For the observed levels (an operator we know), the **best linear unbiased predictors (BLUP)** is obtained by
+```{r}
+fixef(mmod) + ranef(mmod)$operator
+```
+or
+```{r}
+predict(mmod, newdata = data.frame(operator="a"))
+```
+
+- For a new operator, the best we can do is the intercept.
+```{r}
+predict(mmod, re.form = ~ 0)
+```
+
+## Diagnostics
+
+- Diagnostic plots for random effects usually use the residuals calculated using predicted random effects. These residuals are regarded as estimates of $\epsilon$. 
+
+- QQ-plot.
+```{r}
+qqnorm(residuals(mmod), main="")
+```
+
+- Residual vs fitted.
+```{r}
+plot(fitted(mmod), residuals(mmod), xlab = "Fitted", ylab = "Residuals")
+abline(h=0)
+```
+
+## Blocks as random effects
+
+- In the `pulp` example, `operator` defines blocks. 
+
+- In the `penicillin` data set, we want to study how `yield` depends on the `treat` (proccess) and `blend` (corn steep liquor). It is natural to treat `treat` as fixed effects and `blend` as a blocking variable (random effects).
+
+```{r}
+penicillin
+```
+
+- Graphical summary
+```{r}
+penicillin %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = treat, y = yield, color = blend))
+```
+
+```{r}
+penicillin %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = blend, y = yield, color = treat))
+```
+
+- Classical two-way ANOVA:
+```{r}
+op <- options(contrasts = c("contr.sum", "contr.poly"))
+lmod <- aov(yield ~ blend + treat, data = penicillin)
+summary(lmod)
+coef(lmod)
+```
+
+- It is reasonable to treat `treat` as fixed effects and `blend` as random effects (draws from the population of blend).
+```{r}
+mmod <- lmer(yield ~ treat + (1 | blend), data = penicillin)
+summary(mmod)
+options(op)
+```
+Random effect estimates are shrunken version of fixed effect estimates.
+```{r}
+ranef(mmod)$blend
+```
+
+### Test fixed effects
+
+- Kenward-Roger adjusted F-tests for REML.
+```{r}
+library(pbkrtest)
+
+amod_reml <- lmer(yield ~ treat + (1 | blend), data = penicillin, REML = TRUE)
+nmod_reml <- lmer(yield ~ 1 + (1 | blend), data = penicillin, REML = TRUE)
+KRmodcomp(amod_reml, nmod_reml)
+```
+
+-  LRT using $\chi^2$ null distribution.
+```{r}
+amod_mle <- lmer(yield ~ treat + (1 | blend), data = penicillin, REML = FALSE)
+nmod_mle <- lmer(yield ~ 1 + (1 | blend), data = penicillin, REML = FALSE)
+as.numeric(2 * (logLik(amod_mle, REML = FALSE) - logLik(nmod_mle, REML = FALSE)))
+```
+The $\chi_3^2$ approximation gives p-value
+```{r}
+pchisq(4.0474, 3, lower.tail = FALSE)
+```
+
+- Parametric bootstrap. Now we use parametric bootstrap to obtain a p-value for the LRT.
+
+```{r}
+set.seed(123)
+B <- 1000
+lrstat <- numeric(B)
+for (i in 1:B) {
+  ryield <- unlist(simulate(nmod_mle))
+  nmodr <- suppressMessages(lmer(ryield ~ 1 + (1 | blend), data = penicillin, REML = FALSE))
+  amodr <- suppressMessages(lmer(ryield ~ treat + (1 | blend), data = penicillin, REML = FALSE))
+  lrstat[i] <- 2 * (logLik(amodr, REML = FALSE) - logLik(nmodr, REML = FALSE))
+}
+```
+The bootstrap p-value is
+```{r}
+# p-value estimated by parametric bootstrap
+(pval <- mean(lrstat > 4.0474))
+```
+with standard error
+```{r}
+sqrt(pval * (1 - pval) / B)
+```
+
+- The `pbkrtest` packages automate this parametric boostrap procedure (`PBtest`) along with LRT and other tests for fixed effects. LRT and parametric bootstrap results are similar to what we got. Note the F test here is the LRT divided by the degrees of freedom assumed to be F-distributed.
+```{r}
+library(pbkrtest)
+
+set.seed(123)
+PBmodcomp(amod_reml, nmod_reml) %>%
+  summary()
+```
+
+### Test random effects
+
+- Let's test the `blend` random effects by parametric bootstrap. First calculate LRT statistic.
+```{r}
+rmod <- lmer(yield ~ treat + (1 | blend), data = penicillin, REML = FALSE)
+nlmod <- lm(yield ~ treat, data = penicillin)
+as.numeric(2 * (logLik(rmod, REML = FALSE) - logLik(nlmod)))
+```
+Parametric boostrap:
+```{r}
+B <- 1000
+lrstatf <- numeric(B)
+for (i in 1:B) {
+  ryield <- unlist(simulate(nlmod))  
+  nlmodr <- lm(ryield ~ treat, data = penicillin)
+  rmodr <- suppressMessages(lmer(ryield ~ treat + (1 | blend), data = penicillin, REML = FALSE))
+  lrstatf[i] <- 2 * (logLik(rmodr, REML = FALSE) - logLik(nlmodr))
+}
+mean(lrstatf > 3.453634)
+```
+
+- The exact LRT simulation method.
+```{r}
+library(RLRsim)
+
+exactLRT(rmod, nlmod)
+```
+
+## Other designs
+
+More complicated designs discussed in ELMR (split plots, cross effects, multi-level model) are not covered in this course. 
