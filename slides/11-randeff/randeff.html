@@ -667,7 +667,7 @@ table gives the partition <span class="math display">\[\begin{eqnarray*}
 \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{\cdot \cdot})^2 &amp;=&amp;
 \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{i \cdot})^2 + \sum_{i=1}^a
 \sum_{j=1}^n (\bar{y}_{i \cdot} - \bar{y}_{\cdot \cdot})^2.
-\end{eqnarray*}\]</span> Now we have (show in <strong>HW4</strong>)
+\end{eqnarray*}\]</span> Now we have (show in <strong>HW5</strong>)
 <span class="math display">\[\begin{eqnarray*}
 \mathbb{E} (\text{SSE}) &amp;=&amp; a(n-1) \sigma_{\epsilon}^2 \\
 \mathbb{E} (\text{SSA}) &amp;=&amp; (a-1)(n \sigma_{\alpha}^2 +
@@ -739,7 +739,7 @@ designs.</li>
 \]</span></p></li>
 <li><p>We can maximize the log-likelihood function to obtain
 MLE.</p></li>
-<li><p><strong>Exercise (HW4)</strong>: Derive the MLE for the balanced
+<li><p><strong>Exercise (HW5)</strong>: Derive the MLE for the balanced
 one-way ANOVA example.</p></li>
 <li><p>One drawback of MLE is that it produces biased estimate for the
 variance component parameters <span class="math inline">\(\sigma^2\)</span> and <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. E.g., in the linear
@@ -832,7 +832,7 @@ summary(mmod)</code></pre>
 ##             Estimate Std. Error t value
 ## (Intercept)  60.4000     0.1494   404.2</code></pre>
 <p>We found the REML estimate is exactly same as ANOVA estimate.
-<strong>Exercise (HW4)</strong>: show this.</p>
+<strong>Exercise (HW5)</strong>: show this.</p>
 </div>
 </div>
 <div id="inference" class="section level2">
@@ -953,7 +953,7 @@ f(\boldsymbol{\gamma} \mid \mathbf{y}) &amp;=&amp; \frac{f(\mathbf{y}
 \\
 &amp;=&amp; ...
 \end{eqnarray*}\]</span> is a multivariate normal with mean (show in
-<strong>HW4</strong>) <span class="math display">\[
+<strong>HW5</strong>) <span class="math display">\[
 \mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma}
 \mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2
 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
@@ -985,7 +985,7 @@ fixed effects</p>
 ## c    1.312117
 ## d    1.312117</code></pre>
 <p>That’s why Bayesian estimates are often called the shrinkage
-estimator. <strong>Exercise:</strong> prove this in HW4 for the balanced
+estimator. <strong>Exercise:</strong> prove this in HW5 for the balanced
 one-way ANOVA example.</p>
 </div>
 <div id="prediction" class="section level2">

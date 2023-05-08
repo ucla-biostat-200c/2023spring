@@ -367,6 +367,10 @@ information matrix of GLM</a></li>
 (p172)</a></li>
 <li><a href="#q6.-elmr-exercise-8.5-p172" id="toc-q6.-elmr-exercise-8.5-p172">Q6. ELMR Exercise 8.5
 (p172)</a></li>
+<li><a href="#q7.-estimation-of-random-effects" id="toc-q7.-estimation-of-random-effects">Q7. Estimation of random
+effects</a></li>
+<li><a href="#q8.-elmr-exercise-11.1-p251" id="toc-q8.-elmr-exercise-11.1-p251">Q8. ELMR Exercise 11.1
+(p251)</a></li>
 </ul>
 </div>
 
@@ -394,6 +398,32 @@ matrix (expected negative Hessian) of GLM.</p>
 </div>
 <div id="q6.-elmr-exercise-8.5-p172" class="section level2">
 <h2>Q6. ELMR Exercise 8.5 (p172)</h2>
+</div>
+<div id="q7.-estimation-of-random-effects" class="section level2">
+<h2>Q7. Estimation of random effects</h2>
+<ol style="list-style-type: decimal">
+<li><p>Assume the conditional distribution <span class="math display">\[
+\mathbf{y} \mid \boldsymbol{\gamma} \sim N(\mathbf{X} \boldsymbol{\beta}
++ \mathbf{Z} \boldsymbol{\gamma}, \sigma^2 \mathbf{I}_n)
+\]</span> and the prior distribution <span class="math display">\[
+\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma}).
+\]</span> Then by the Bayes theorem, the posterior distribution is <span class="math display">\[\begin{eqnarray*}
+f(\boldsymbol{\gamma} \mid \mathbf{y}) &amp;=&amp; \frac{f(\mathbf{y}
+\mid \boldsymbol{\gamma}) \times f(\boldsymbol{\gamma})}{f(\mathbf{y})},
+\end{eqnarray*}\]</span> where <span class="math inline">\(f\)</span>
+denotes corresponding density. Show that the posterior distribution is a
+multivariate normal with mean <span class="math display">\[
+\mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma}
+\mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2
+\mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
+\]</span></p></li>
+<li><p>For the balanced one-way ANOVA random effects model, show that
+the posterior mean of random effects is always a constant (less than 1)
+multiplying the corresponding fixed effects estimate.</p></li>
+</ol>
+</div>
+<div id="q8.-elmr-exercise-11.1-p251" class="section level2">
+<h2>Q8. ELMR Exercise 11.1 (p251)</h2>
 </div>
 
 

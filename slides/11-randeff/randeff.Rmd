@@ -138,7 +138,7 @@ mean(pulp$bright)
 \text{SST} &=& \text{SSE} + \text{SSA} \\
 \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{\cdot \cdot})^2 &=& \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{i \cdot})^2 + \sum_{i=1}^a \sum_{j=1}^n (\bar{y}_{i \cdot} - \bar{y}_{\cdot \cdot})^2.
 \end{eqnarray*}
-Now we have (show in **HW4**)
+Now we have (show in **HW5**)
 \begin{eqnarray*}
 \mathbb{E} (\text{SSE}) &=& a(n-1) \sigma_{\epsilon}^2 \\
 \mathbb{E} (\text{SSA}) &=& (a-1)(n \sigma_{\alpha}^2 + \sigma_{\epsilon}^2),
@@ -188,7 +188,7 @@ $$
 $$
 - We can maximize the log-likelihood function to obtain MLE. 
 
-- **Exercise (HW4)**: Derive the MLE for the balanced one-way ANOVA example.
+- **Exercise (HW5)**: Derive the MLE for the balanced one-way ANOVA example.
 
 - One drawback of MLE is that it produces biased estimate for the variance component parameters $\sigma^2$ and $\boldsymbol{\Sigma}$. E.g., in the linear regression case (fixed effects model), MLE for $\sigma^2$ is
 $$
@@ -226,7 +226,7 @@ library(lme4)
 mmod <- lmer(bright ~ 1 + (1 | operator), data = pulp, REML = TRUE)
 summary(mmod)
 ```
-We found the REML estimate is exactly same as ANOVA estimate. **Exercise (HW4)**: show this. 
+We found the REML estimate is exactly same as ANOVA estimate. **Exercise (HW5)**: show this. 
 
 ## Inference
 
@@ -311,7 +311,7 @@ Then by the Bayes theorem, the **posterior distribution** is
 f(\boldsymbol{\gamma} \mid \mathbf{y}) &=& \frac{f(\mathbf{y} \mid \boldsymbol{\gamma}) \times f(\boldsymbol{\gamma})}{f(\mathbf{y})} \\
 &=& ...
 \end{eqnarray*}
-is a multivariate normal with mean (show in **HW4**)
+is a multivariate normal with mean (show in **HW5**)
 $$
 \mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma} \mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
 $$
@@ -328,7 +328,7 @@ We found the estimated random effects are uniformly smaller than the fixed effec
 ```{r}
 cc[[1]]$operator / ranef(mmod)$operator
 ```
-That's why Bayesian estimates are often called the shrinkage estimator. **Exercise:** prove this in HW4 for the balanced one-way ANOVA example.
+That's why Bayesian estimates are often called the shrinkage estimator. **Exercise:** prove this in HW5 for the balanced one-way ANOVA example.
 
 ## Prediction
 
