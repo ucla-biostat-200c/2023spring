@@ -679,16 +679,46 @@ b(\theta_i)}{a(\phi)} + c(y_i, \phi) \\
 \mathbf{x}_i \mathbf{x}_i^T \\
 &amp; &amp; + \sum_{i=1}^n \frac{(y_i - \mu_i) [\mu_i&#39;(\eta_i)]^2 (d
 \sigma_i^{2} / d\mu_i)}{\sigma_i^4} \mathbf{x}_i \mathbf{x}_i^T.
-\end{eqnarray*}\]</span> <strong>Show this in HW4</strong>. For GLMs
-with canonical links, the second term and third term cancel using the
-fact <span class="math display">\[
+\end{eqnarray*}\]</span></p></li>
+</ul>
+<p>For GLMs with canonical links, the second term and third term cancel
+using the fact <span class="math display">\[
 \frac{d\mu_i}{d \eta_i} = \frac{d\mu_i}{d \theta_i} = \frac{d \,
 b&#39;(\theta_i)}{d \theta_i} = b&#39;&#39;(\theta_i) =
 \frac{\sigma_i^2}{a(\phi)}.
 \]</span> Therefore for canonical link the negative Hessian is positive
-semidefinte and Newton’s algorithm with line search is stable.</p>
-<p>See Biostat 216 <a href="https://ucla-biostat216-2019fall.github.io/slides/16-matrixcalc/16-matrixcalc.html">lecture
-notes</a> for a refresher of matrix calculus.</p></li>
+semidefinte and Newton’s algorithm with line search is stable. See
+Biostat 216 <a href="https://ucla-biostat216-2019fall.github.io/slides/16-matrixcalc/16-matrixcalc.html">lecture
+notes</a> for a refresher of matrix calculus.</p>
+<p><strong>Show this in HW4 (HINT) </strong> <span class="math display">\[\begin{eqnarray*}
+\nabla \ell_i(\boldsymbol{\beta}) &amp;=&amp; \frac{y_i -
+b&#39;(\theta_i)}{a(\phi)} \nabla_{\boldsymbol{\beta}} \theta_i \\
+&amp;=&amp; \frac{y_i - b&#39;(\theta_i)}{a(\phi)} \cdot
+\frac{d\theta_i}{d\mu_i} \cdot \nabla_{\boldsymbol{\beta}} \mu_i.
+\end{eqnarray*}\]</span> From Q1, <span class="math display">\[
+\frac{d \mu_i}{d \theta_i} = b&#39;&#39;(\theta_i).
+\]</span> Thus <span class="math display">\[\begin{eqnarray*}
+\nabla \ell_i(\boldsymbol{\beta}) = \frac{y_i -
+b&#39;(\theta_i)}{a(\phi) b&#39;&#39;(\theta_i)}
+\nabla_{\boldsymbol{\beta}} \mu_i = \frac{[y_i - b&#39;(\theta_i)]
+\mu_i&#39;(\eta_i)}{\sigma_i^2} \mathbf{x}_i = \frac{(y_i - \mu_i)
+\mu_i&#39;(\eta_i)}{\sigma_i^2} \mathbf{x}_i.
+\end{eqnarray*}\]</span> Taking the second derivative gives <span class="math display">\[
+\nabla^2 \ell_i(\boldsymbol{\beta}) = -
+\frac{[\mu_i&#39;(\eta_i)]^2}{\sigma_i^2} \mathbf{x}_i \mathbf{x}_i^T +
+\frac{(y_i - \mu_i) \mu_i&#39;&#39;(\eta_i)}{\sigma_i^2} \mathbf{x}_i
+\mathbf{x}_i^T - \frac{(y_i - \mu_i)[\mu_i&#39;(\eta_i)]^2 (d \sigma_i^2
+/ d \mu_i)}{\sigma_i^4} \mathbf{x}_i \mathbf{x}_i^T.
+\]</span> Note, with canonical link <span class="math inline">\(\theta_i
+= \eta_i\)</span>,</p>
+<p><span class="math display">\[
+\frac{d\mu_i}{d \eta_i} = \frac{d\mu_i}{d \theta_i} = \frac{d \,
+b&#39;(\theta_i)}{d \theta_i} = b&#39;&#39;(\theta_i) =
+\frac{\sigma_i^2}{a(\phi)}.
+\]</span> Then <span class="math display">\[
+\frac{\mu_i&#39;&#39;(\eta_i)}{\sigma_i^2} = ...
+\]</span></p>
+<ul>
 <li><p>How about non-canonical link? We use the expected (Fisher)
 information matrix <span class="math display">\[
 \mathbb{E} [- \nabla^2 \ell(\boldsymbol{\beta})] = \sum_{i=1}^n
