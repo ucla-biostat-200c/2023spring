@@ -1,0 +1,226 @@
+---
+title: "Repeated Measures and Longitudinal Data (ELMR Chapter 11)"
+author: "Dr. Jin Zhou @ UCLA"
+date: "May 11, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = TRUE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+library(precrec)
+# install.packages("precrec")
+```
+
+## Longitudinal data - PSID data set
+
+- `psid` (Panel Study of Income Dynamics) data records the income of 85 individuals, who were aged 25-39 in 1968 and had complete data for at least 11 of the years between 1968 and 1990.
+
+```{r}
+psid <- as_tibble(psid) %>%
+  print(n = 30)
+summary(psid)
+```
+
+- Display trajectories of first 20 individuals.
+
+```{r}
+psid %>%
+  filter(person <= 20) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = year, y = income)) + 
+  facet_wrap(~ person) + 
+  labs(x = "Year", y = "Income")
+```
+
+- Income trajectories stratified by sex. We observe men's incomes are generally higher and less variable than women's. Women's income seems to increase quicker than men's. How to test these hypotheses?
+
+```{r}
+psid %>%
+  filter(person <= 20) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = year, y = income, group = person)) + 
+  facet_wrap(~ sex) + 
+  scale_y_log10()
+```
+
+- If we fit a seperate linear model for each individual, we see variability in the intercepts and slopes. We use log income as response and center `year` by the median 78. 
+
+```{r}
+library(lme4)
+
+psid <- psid %>%
+  mutate(cyear = I(year - 78))
+
+oldw <- getOption("warn")
+options(warn = -1) # turn off warnings
+ml <- lmList(log(income) ~ cyear | person, data = psid)
+options(warn = oldw)
+
+intercepts <- sapply(ml, coef)[1, ]
+slopes     <- sapply(ml, coef)[2, ]
+tibble(int = intercepts,
+       slo = slopes) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = int, y = slo)) + 
+  labs(x = "Intercept", y = "Slope")
+```
+
+- We consider a linear mixed model with random intercepts and random slopes
+$$
+\log (\text{income}_{ij}) = \mu + \text{year}_i \cdot \beta_{\text{year}} + \text{sex}_j \cdot \beta_{\text{sex}} + (\text{sex}_j \times \text{year}_i) \cdot \beta_{\text{sex} \times \text{year}} + \text{educ}_j \times \beta_{\text{educ}} + \text{age}_j \cdot \beta_{\text{age}} + \gamma_{0,j} + \text{year}_i \cdot \gamma_{1,j} + \epsilon_{ij}
+$$
+where $i$ indexes year and $j$ indexes individual. The random intercepts and slopes are iid
+$$
+\begin{pmatrix}
+\gamma_{0,j} \\
+\gamma_{1,j}
+\end{pmatrix} \sim N(\mathbf{0}, \boldsymbol{\Sigma}).
+$$
+and the noise terms $\epsilon_{ij}$ are iid $N(0, \sigma^2)$.
+
+```{r}
+mmod <- lmer(log(income) ~ cyear * sex + age + educ + (cyear | person), data = psid)
+summary(mmod)
+```
+
+- Exercise: interpretation of fixed effects. 
+
+- To test the fixed effects, we can use the Kenward-Roger adjusted F-test. For example, to test the interaction term
+```{r}
+library(pbkrtest)
+
+mmod <- lmer(log(income) ~ cyear * sex + age + educ + (cyear | person), data = psid, REML = TRUE)
+mmodr <- lmer(log(income) ~ cyear + sex + age + educ + (cyear | person), data = psid, REML = TRUE)
+KRmodcomp(mmod, mmodr)
+```
+The interaction term is marginally significant. 
+
+- We can test the significance of the variance components by the parameteric bootstrap.
+```{r}
+confint(mmod, method = "boot")
+```
+All variance component parameters are significant except for the covariance (correlation) between random intercept and slope. 
+
+- QQ plots shows violation of normal assumption. It suggests other transformation of responses. 
+```{r}
+(diagd <- fortify.merMod(mmod))
+diagd %>%
+  ggplot(mapping = aes(sample = .resid)) + 
+  stat_qq() + facet_grid(~sex)
+```
+
+- Residuals vs fitted value plots.
+```{r}
+diagd$edulevel <- cut(psid$educ, 
+                      c(0, 8.5, 12.5, 20), 
+                      labels=c("lessHS", "HS", "moreHS"))
+diagd %>%
+  ggplot(mapping = aes(x = .fitted, y = .resid)) + 
+  geom_point(alpha = 0.3) + 
+  geom_hline(yintercept = 0) + 
+  facet_grid(~ edulevel) + 
+  labs(x = "Fitted", ylab = "Residuals")
+```
+
+## Repeat measures - `vision` data
+
+- Reponse is `acuity`. Each individual is tested on left and right eyes under 4 powers. 
+
+```{r}
+vision <- as_tibble(vision) %>%
+  print(n = Inf)
+```
+
+- Graphical summary. Individual 6 seems unsual. 
+
+```{r}
+vision %>%
+  mutate(npower = rep(1:4, 14)) %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = npower, y = acuity, linetype = eye)) + 
+  facet_wrap(~ subject) +
+  scale_x_continuous("Power", breaks = 1:4, 
+                     labels = c("6/6", "6/18", "6/36", "6/60"))
+```
+
+- Modelling: power is a fixed effect, subject is random effect, eye is nested within subjects. 
+$$
+y_{ijk} = \mu + p_j + s_i + e_{ik} + \epsilon_{ijk},
+$$
+where $i=1,\ldots,7$ indexes individuals, $j=1,\ldots,4$ indexes power, and $k=1,2$ indexes eyes. The random effect distributions are
+$$
+s_i \sim_{\text{iid}} N(0,\sigma_s^2), \quad e_{ik} \sim_{\text{iid}} N(0,\sigma_e^2) \text{ for fixed } i, \quad \epsilon_{ijk} \sim_{\text{iid}} N(0, \sigma^2).
+$$
+$\sigma_e^2$ is interpreted as the variance of acuity between combinations of `eyes` and `subject`, since we don't believe the eye difference is consistent across individuals.
+
+```{r}
+mmod <- lmer(acuity ~ power + (1 | subject) + (1 | subject:eye), data = vision)
+summary(mmod)
+```
+
+### Test fixed effects
+
+- To test the fixed effect `power`, we can use the Kenward-Roger adjusted F-test. We find the `power` is not significant at the 0.05 level. 
+
+```{r}
+mmod <- lmer(acuity ~ power + (1 | subject) + (1 | subject:eye), data = vision, REML = TRUE)
+nmod <- lmer(acuity ~ (1 | subject) + (1 | subject:eye), data = vision, REML = TRUE)
+KRmodcomp(mmod, nmod)
+```
+
+- LRT.
+```{r}
+mmod_mle <- lmer(acuity ~ power + (1 | subject) + (1 | subject:eye), data = vision, REML = FALSE)
+nmod_mle <- lmer(acuity ~ (1 | subject) + (1 | subject:eye), data = vision, REML = FALSE)
+(lrtstat <- as.numeric(2 * (logLik(mmod_mle, REML = FALSE) - logLik(nmod_mle, REML = FALSE))))
+pchisq(lrtstat, 3, lower.tail = FALSE)
+```
+
+- Parametric bootstrap.
+
+```{r}
+library(pbkrtest)
+
+set.seed(123)
+PBmodcomp(mmod, nmod) %>%
+  summary()
+```
+
+- If we exclude individual 6 left eye at power 6/36, then `power` becomes significant.
+
+```{r}
+mmodr <- lmer(acuity ~ power + (1 | subject) + (1 | subject:eye), data = vision, REML = TRUE, subset = -43)
+nmodr <- lmer(acuity ~ (1 | subject) + (1 | subject:eye), data = vision, REML = TRUE, subset = -43)
+KRmodcomp(mmodr, nmodr)
+
+PBmodcomp(mmodr, nmodr) %>%
+  summary()
+```
+
+### Test random effects
+
+- To test significance of the variance component parameters by parametric bootstrap.
+
+```{r}
+mmod <- lmer(acuity ~ power + (1 | subject) + (1 | subject:eye), data = vision)
+confint(mmod, method = "boot")
+```
+
+- Diagnostic plots. 
+```{r}
+qqnorm(ranef(mmodr)$"subject:eye"[[1]], main = "")
+plot(resid(mmodr) ~ fitted(mmodr), xlab = "Fitted", ylab = "Residuals")
+abline(h=0)
+```
