@@ -1,0 +1,48 @@
+---
+title: "Biostat 200C Midterm Preparations"
+author: ""
+subtitle: 
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(tidyverse)
+library(faraway)
+library(survival)
+```
+
+1. What is the deviance for 
+    - the full/saturate model
+    - the fitted model
+    
+  
+2. Calculate the log-likelihood and deviance values of this fitted model using information from R output.
+
+3. State the hypotheses being tested in a goodness of fit test by the analysis of deviance approach.
+
+4. How to make conclusion from a goodness of fit test based on an R output?
+
+5. Calculate the odds and 95% confidence interval for the calculated odds given a set of covariates. 
+
+6. What is the Hessian matrix of the log-likelihood function? 
+
+7. Explain whether the log-likelihood function is a concave function given the link
+
+8. ROC, sensitivity, specificity
+
+9. Matched case-control study
+
+10. Total number of parameters in different GLMs, e.g., multinomial model
+
+11. Link functions/corresponding latent variable distributions
+
+12. Exponential family distributions
+    - What is the canonical parameters? 
+    - Mean and variance.
+    - Canonical link function 
+
+
