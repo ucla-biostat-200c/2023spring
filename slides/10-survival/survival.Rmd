@@ -1,7 +1,7 @@
 ---
 title: "Survival Analysis (DB 10)"
-author: "Dr. Hua Zhou @ UCLA"
-date: "May 5, 2020"
+author: "Dr. Jin Zhou @ UCLA"
+date: "May 23, 2020"
 output:
   # ioslides_presentation: default
   html_document:
@@ -23,7 +23,7 @@ library(tidyverse)
 knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
 ```
 
-This lecture note draws heavily on the Chapter 10 of textbook _An Introduction to Generalized Linear Models_ by Dobson and Barnett (2nd or 3rd edition). [ULCA library link to the 2nd edition](https://ucla.on.worldcat.org/oclc/317751780).
+This lecture note draws heavily on the Chapter 10 of textbook _An Introduction to Generalized Linear Models_ by Dobson and Barnett (2nd or 3rd edition). 
 
 ## Introduction
 
