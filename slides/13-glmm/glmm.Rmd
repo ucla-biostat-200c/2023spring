@@ -1,0 +1,324 @@
+---
+title: "Mixed Effects Models for Nonnormal Responses (ELMR Chapter 13)"
+author: "Dr. Jin Zhou @ UCLA"
+date: "May 18, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = TRUE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+
+## Generalized linear mixed models (GLMM)
+
+- So far we studied linear mixed models (LMM), where the responses are continuous and normally distributed. It is natural to extend LMM to handle nonnormally distributed responses. 
+
+- Recall that, in GLM, the distribution of $Y_i$ is from the exponential family of distributions of form
+$$
+  f(y_i \mid \theta_i, \phi) = \exp \left[ \frac{y \theta_i - b(\theta_i)}{a(\phi)} + c(y_i, \phi) \right].
+$$
+If we use the **canonical link**, then
+$$
+\theta_i = g(\mu_i) = \eta_i,
+$$
+where $\mu_i = \mathbb{E} Y_i$. Now let
+$$
+\eta_i = \mathbf{x}_i^T \boldsymbol{\beta} + \mathbf{z}_i^T \boldsymbol{\gamma},
+$$
+where $\boldsymbol{\beta}$ is the fixed effects and $\boldsymbol{\gamma}$ is the random effects with density $h(\gamma \mid \boldsymbol{\Sigma})$. (Typically we assume multivariate normal with mean 0 and covariance $\boldsymbol{\Sigma}$.) Then the likelihood is
+$$
+L(\boldsymbol{\beta}, \phi, \boldsymbol{\Sigma}) = \prod_{i=1}^n \int f(y_i \mid \boldsymbol{\beta}, \phi, \boldsymbol{\gamma}) h(\boldsymbol{\gamma} \mid \boldsymbol{\Sigma}) \, d \boldsymbol{\gamma}
+$$
+and the log-likelihood is
+$$
+\ell(\boldsymbol{\beta}, \phi, \boldsymbol{\Sigma}) = \sum_{i=1}^n \log \int f(y_i \mid \boldsymbol{\beta}, \phi, \boldsymbol{\gamma}) h(\boldsymbol{\gamma} \mid \boldsymbol{\Sigma}) \, d \boldsymbol{\gamma}.
+$$
+This model, combining GLM and mixed effects model, is called the **generalized linear mixed effects model (GLMM)**.
+
+## Overview of estimation and inference methods
+
+- Estimation and inference of GLMM have been active research. We give an overview of a few commonly used methods.
+
+- **Maximum likelihood estimate (MLE)** is obtained by maximizing the log-likelihood function. However, each iteration of the optimization algorithm needs to evaluate numerical integration, which quickly becomes infeasible when the dimension of random effects $\boldsymbol{\gamma}$ is large.
+
+    - **Gauss-Hermite quadrature** can be used for numerical integration. It approximates the integral by a weighted sum of integrands at different knots. The more knots, the more accurate the approximation, but at higher computational expense. 
+    
+    - **Laplace approximation** is a special case of Gauss-Hermite quadrature with only one knot. It is less accurate than Guass-Hermite quadrature but computationally cheaper. 
+    
+- **Bayesian method** is another approach for estimation and inference of GLMM. It's not covered in this course due to time constraint. Interested students can study ELMR Chapter 12. 
+
+- **Penalized quasi-likelihood (PQL)**. In the IRWLS (iteratively reweighted least squares) procedure for estimating the GLM, each iteration uses the pseudo-response or working response
+$$
+  \mathbf{z}^{(t)} = \boldsymbol{\eta}^{(t)} + (\mathbf{W}^{(t)})^{-1} (\mathbf{y} - \widehat{\boldsymbol{\mu}}^{(t)}).
+$$
+It can be adapted to the mixed effects model. PQL has computational advantage but generally considered less accurate than other approaches. 
+
+- **Generalized estimation equations (GEE)**. To be discussed later.
+
+## Binary response example
+
+- `ctsib` data in EMLR studies the balance of 40 individuals.
+    - Response: stability (1 = stable, 0 = instable).  
+    - Predictors: sex (binary), age (continuous), height (continuous), surface (binary, `norm` or `foam`), vision (factor, `open` or `closed` or `dome`).   
+    - Each subject is tested twice on a combination of `surface` and `vision`. 12 measurements per subject.  
+
+```{r}
+ctsib <- as_tibble(ctsib) %>%
+  mutate(stable = ifelse(CTSIB == 1, 1, 0)) %>%
+  print(n = 24)
+summary(ctsib)
+```
+
+- Graphical summary.
+
+```{r}
+subsum <- ctsib %>% 
+  group_by(Subject) %>%
+  summarise(Height = Height[1], 
+            Weight = Weight[1], 
+            stable = mean(stable), 
+            Age    = Age[1], 
+            Sex    = Sex[1])
+subsum %>%  
+  ggplot() + 
+  geom_point(mapping = aes(x = Height, y = stable))
+subsum %>%  
+  ggplot() + 
+  geom_point(mapping = aes(x = Weight, y = stable))
+subsum %>%  
+  ggplot() + 
+  geom_point(mapping = aes(x = Age, y = stable))
+subsum %>%  
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Sex, y = stable))
+```
+
+```{r}
+ctsib %>%
+  group_by(Subject, Surface) %>%
+  summarize(stable = mean(stable)) %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Surface, y = stable)) + 
+  scale_y_log10()
+```
+
+```{r}
+ctsib %>%
+  group_by(Subject, Vision) %>%
+  summarize(stable = mean(stable)) %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Vision, y = stable)) + 
+  scale_y_log10()
+```
+
+- GLM analysis. What are the issues with the GLM here? 
+
+```{r}
+gf <- glm(stable ~ Sex + Age + Height + Weight + Surface + Vision, 
+          family = binomial,
+          data   = ctsib)
+summary(gf)
+```
+
+- GLMM analysis. We treat subjects as random. First, estimation by **Laplace approximation**.
+
+```{r}
+library(lme4)
+
+modlap <- 
+  glmer(stable ~ Sex + Age + Height + Weight + Surface + Vision + (1 | Subject),
+        family = binomial,
+        data   = ctsib)
+summary(modlap)
+```
+
+- GLMM estimation by **Gauss-Hermite quadrature** with 25 knots.
+    
+```{r}
+library(lme4)
+
+modgh <- 
+  glmer(stable ~ Sex + Age + Height + Weight + Surface + Vision + (1 | Subject),
+        nAGQ   = 25,
+        family = binomial,
+        data   = ctsib)
+summary(modgh)
+```
+
+- GLMM estimation by PQL.
+
+```{r}
+library(MASS)
+
+modpql <- glmmPQL(stable ~ Sex + Age + Height + Weight + Surface + Vision,
+                  random = ~ 1 | Subject,
+                  family = binomial,
+                  data   = ctsib)
+summary(modpql)
+```
+
+## Count response example
+
+- `epilepsy` data in ELMR.   
+    - Response: `seizures` (number of seizures of each epilepsy patient).  
+    - Variables: `treat` (binary, 1 = treatment or 0 = control group), `expind` (binary, 0 = baseline or 1 = experiment phase), `timeadj` (length of phase).
+
+```{r}
+epilepsy <- as_tibble(epilepsy) %>% 
+  mutate(period = rep(0:4, 59), 
+         drug   = factor(c("placebo", "treatment"))[treat + 1],
+         phase  = factor(c("baseline", "experiment"))[expind + 1]) %>%
+  print()
+summary(epilepsy)
+```
+
+- Numerical summary. Is there any difference in the number of seizures per week in the placebo and treatment groups?
+
+```{r}
+epilepsy %>%
+  group_by(drug, phase) %>%
+  summarize(rate = mean(seizures / timeadj)) %>%
+  xtabs(formula = rate ~ phase + drug)
+```
+
+- Graphical summary. 
+
+```{r}
+epilepsy %>%
+  ggplot() + 
+  geom_line(mapping = aes(x = period, y = seizures, linetype = drug, group = id)) +
+  xlim(1, 4) + 
+  scale_y_sqrt(breaks = (0:10)^2) + 
+  theme(legend.position = "top", legend.direction = "horizontal")
+```
+
+```{r}
+ratesum <- epilepsy %>%
+  group_by(id, phase, drug) %>%
+  summarize(rate = mean(seizures / timeadj))
+
+spread(ratesum, phase, rate) %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = baseline, y = experiment, shape = drug)) + 
+  scale_x_sqrt() + scale_y_sqrt() + 
+  geom_abline(intercept = 0, slope = 1) + 
+  theme(legend.position = "top", legend.direction = "horizontal")
+```
+
+- In following analysis we remove patient 49, who seems to have unsually high rate of seizures.
+```{r}
+epilo <- filter(epilepsy, id != 49)
+```
+
+- We start with GLM analysis even though the model is not correct due to the grouping of observations. 
+
+```{r}
+modglm <- glm(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat), 
+              family   = poisson,
+              data     = epilo)
+summary(modglm)
+```
+
+- GLMM analysis by Gauss-Hermite quadrature with 25 knots.
+
+```{r}
+library(lme4)
+
+modgh <- glmer(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat) + (1 | id), 
+               nAGQ     = 25,
+               family   = poisson,
+               data     = epilo)
+summary(modgh)
+```
+
+- GLMM estimation by PQL.
+
+```{r}
+library(MASS)
+
+modpql <- glmmPQL(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat),
+                  random = ~ 1 | id,
+                  family = poisson,
+                  data   = epilo)
+summary(modpql)
+```
+
+## GEE (generalized estimation equation)
+
+- The quasi-likelihood (quasi-binomial, quasi-Poisson, etc) approach can be generalized to handle correlated, nonnormal responses.
+
+- Let $\mathbf{Y}_i$ be the response vector of $i$-th individual.
+\begin{eqnarray*}
+\mathbb{E} \mathbf{Y}_i &=& \boldsymbol{\mu}_i \\
+g(\boldsymbol{\mu}_i) &=& \mathbf{X}_i \boldsymbol{\beta} \\
+\mathbf{V}_i &=& \text{Var}(\mathbf{Y}_i) = \phi \mathbf{A}_i^{1/2} \mathbf{R}_i(\boldsymbol{\alpha}) \mathbf{A}_i^{1/2},
+\end{eqnarray*}
+where $\mathbf{A}_i = \text{diag}(a(\boldsymbol{\mu}))$ captures the individual variances and $\mathbf{R}_i(\boldsymbol{\alpha})$ is a **working correlation matrix**. 
+
+- Commonly used working correlation are
+
+    - compound symmetry, or equicorrelation, or exchangeable correlation:
+    $$
+    \mathbf{R}(\rho) = \begin{pmatrix}
+    1 & \rho & \cdots & \rho \\
+    \rho & 1 & & \rho \\
+    \vdots & & \ddots & \vdots \\
+    \rho & \rho & \cdots & 1
+    \end{pmatrix}
+    $$
+    
+    - Autoregressive model:
+    $$
+    \mathbf{R}(\rho) = \begin{pmatrix}
+    1 & \rho & \rho^2 & \cdots & \rho^{n-1} \\
+    \rho & 1 & \rho &  & \rho^{n-2} \\
+    \rho^2 & \rho & 1 & & \vdots \\
+    \vdots & & & \ddots & \\
+    \rho^{n-1} & \cdots & & \rho & 1
+    \end{pmatrix}
+    $$
+    
+    - Unstructured correlation matrix
+
+- Given estimates of $\phi$ and $\boldsymbol{\alpha}$, we solve the **estimation equation**
+$$
+\sum_i [D_{\boldsymbol{\beta}} \boldsymbol{\mu}_i(\boldsymbol{\beta})]^T \mathbf{V}_i^{-1}(\mathbf{Y}_i - \boldsymbol{\mu}_i) = \mathbf{0}.
+$$
+
+- Let's revisit the `ctsib` (stability) data set. We use the exchangeable correlation, or equivalently, compound symmetry. Standard errors and Wald test are constructed using the sandwich estimators. $\boldsymbol{\beta}$ estimates in GEE are about half the size of those from GLMM. The `scale.fix = TRUE` instructs the function `geeglm` not estimate the dispersion parameter $\phi$, since for binary response the dispersion is always 1. 
+
+```{r}
+library(geepack)
+
+modgeep <- geeglm(stable    ~ Sex + Age + Height + Weight + Surface + Vision,
+                  id        = Subject, 
+                  corstr    = "exchangeable",
+                  scale.fix = TRUE,
+                  data      = ctsib,
+                  family    = binomial(link = "logit"))
+summary(modgeep)
+```
+
+- Let's revisit the `epilepsy` data set. 
+
+```{r}
+modgeep <- geeglm(seizures ~ offset(log(timeadj)) + expind + treat + I(expind*treat),
+                  id       = id, 
+                  family   = poisson,
+                  corstr   = "ar1", 
+                  data     = epilepsy,
+                  subset  = (id != 49))
+summary(modgeep)
+```
