@@ -24,7 +24,7 @@ BruinLearn: <https://bruinlearn.ucla.edu/courses/160230>
 | 7 | 5/16/23 midterm     | 5/18/23  GLMM (ELMR Ch13) [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/slides/13-glmm/glmm.Rmd), [html](../slides/13-glmm/glmm.html) | HW4 Due | 
 | 8 | 5/23/23 survival outcome (DB Ch10) [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/slides/10-survival/survival.Rmd), [html](../slides/10-survival/survival.html)  | nonparametric regression (ELMR Ch14) | HW5 [html](../hw/hw5.html), [Rmd](https://raw.githubusercontent.com/ucla-biostat-200c/2023spring/master/hw/hw5.Rmd)|
 | 9 | 5/30/23 5/25/23  midterm review  | 6/1/23 GAM (ELMR Ch15)   | HW5 Due| 
-| 10 | 6/6/23 Tree (ELMR Ch6)  | 6/8/23 Neural Networks (Ch17) |Take home Final | 
+| 10 | 6/6/23 Tree (ELMR Ch16)  | 6/8/23 Neural Networks (Ch17) |Take home Final | 
 
 <!--
 | 3 | 4/14 binomial response (ELMR 3) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/04-binomial/binomial.Rmd), [html](../slides/04-binomial/binomial.html)\]  | [4/16](https://ucla-biostat-200c-2020spring.github.io/biostat200cspring2020/2020/04/16/week3-day2.html) more on logistic reg. (ELMR 4) \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/slides/05-otherlogistic/otherlogistic.Rmd), [html](../slides/05-otherlogistic/otherlogistic.html)\] | HW2 \[[Rmd](https://raw.githubusercontent.com/ucla-biostat-200c-2020spring/ucla-biostat-200c-2020spring.github.io/master/hw/hw2/hw2.Rmd), [html](../hw/hw2/hw2.html)\] |  
