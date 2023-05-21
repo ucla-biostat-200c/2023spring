@@ -125,7 +125,7 @@ ctsib %>%
 
 - GLM analysis. What are the issues with the GLM here? 
 
-```{r}
+```{r, warning=F}
 gf <- glm(stable ~ Sex + Age + Height + Weight + Surface + Vision, 
           family = binomial,
           data   = ctsib)
@@ -134,7 +134,7 @@ summary(gf)
 
 - GLMM analysis. We treat subjects as random. First, estimation by **Laplace approximation**.
 
-```{r}
+```{r, warning=F}
 library(lme4)
 
 modlap <- 
@@ -146,7 +146,7 @@ summary(modlap)
 
 - GLMM estimation by **Gauss-Hermite quadrature** with 25 knots.
     
-```{r}
+```{r, warning=F}
 library(lme4)
 
 modgh <- 
@@ -159,7 +159,7 @@ summary(modgh)
 
 - GLMM estimation by PQL.
 
-```{r}
+```{r, warning=F}
 library(MASS)
 
 modpql <- glmmPQL(stable ~ Sex + Age + Height + Weight + Surface + Vision,
@@ -175,7 +175,7 @@ summary(modpql)
     - Response: `seizures` (number of seizures of each epilepsy patient).  
     - Variables: `treat` (binary, 1 = treatment or 0 = control group), `expind` (binary, 0 = baseline or 1 = experiment phase), `timeadj` (length of phase).
 
-```{r}
+```{r, warning=F}
 epilepsy <- as_tibble(epilepsy) %>% 
   mutate(period = rep(0:4, 59), 
          drug   = factor(c("placebo", "treatment"))[treat + 1],
@@ -186,16 +186,20 @@ summary(epilepsy)
 
 - Numerical summary. Is there any difference in the number of seizures per week in the placebo and treatment groups?
 
-```{r}
+```{r, warning=F}
 epilepsy %>%
   group_by(drug, phase) %>%
   summarize(rate = mean(seizures / timeadj)) %>%
   xtabs(formula = rate ~ phase + drug)
 ```
 
+```{r}
+table(epilepsy$treat, epilepsy$phase)
+```
+
 - Graphical summary. 
 
-```{r}
+```{r, warning=F}
 epilepsy %>%
   ggplot() + 
   geom_line(mapping = aes(x = period, y = seizures, linetype = drug, group = id)) +
@@ -204,7 +208,7 @@ epilepsy %>%
   theme(legend.position = "top", legend.direction = "horizontal")
 ```
 
-```{r}
+```{r, warning=F}
 ratesum <- epilepsy %>%
   group_by(id, phase, drug) %>%
   summarize(rate = mean(seizures / timeadj))
@@ -218,13 +222,13 @@ spread(ratesum, phase, rate) %>%
 ```
 
 - In following analysis we remove patient 49, who seems to have unsually high rate of seizures.
-```{r}
+```{r, warning=F}
 epilo <- filter(epilepsy, id != 49)
 ```
 
 - We start with GLM analysis even though the model is not correct due to the grouping of observations. 
 
-```{r}
+```{r, warning=F}
 modglm <- glm(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat), 
               family   = poisson,
               data     = epilo)
@@ -233,7 +237,7 @@ summary(modglm)
 
 - GLMM analysis by Gauss-Hermite quadrature with 25 knots.
 
-```{r}
+```{r, warning=F}
 library(lme4)
 
 modgh <- glmer(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat) + (1 | id), 
@@ -245,7 +249,7 @@ summary(modgh)
 
 - GLMM estimation by PQL.
 
-```{r}
+```{r, warning=F}
 library(MASS)
 
 modpql <- glmmPQL(seizures ~ offset(log(timeadj)) + expind + treat + I(expind * treat),
@@ -299,7 +303,7 @@ $$
 
 - Let's revisit the `ctsib` (stability) data set. We use the exchangeable correlation, or equivalently, compound symmetry. Standard errors and Wald test are constructed using the sandwich estimators. $\boldsymbol{\beta}$ estimates in GEE are about half the size of those from GLMM. The `scale.fix = TRUE` instructs the function `geeglm` not estimate the dispersion parameter $\phi$, since for binary response the dispersion is always 1. 
 
-```{r}
+```{r, warning=F}
 library(geepack)
 
 modgeep <- geeglm(stable    ~ Sex + Age + Height + Weight + Surface + Vision,
@@ -313,7 +317,7 @@ summary(modgeep)
 
 - Let's revisit the `epilepsy` data set. 
 
-```{r}
+```{r, warning=F}
 modgeep <- geeglm(seizures ~ offset(log(timeadj)) + expind + treat + I(expind*treat),
                   id       = id, 
                   family   = poisson,
