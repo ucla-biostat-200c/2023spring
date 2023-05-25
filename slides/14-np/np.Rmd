@@ -1,0 +1,375 @@
+---
+title: "Nonparametric Regression (ELMR Chapter 14)"
+author: "Dr. Hua Zhou @ UCLA"
+date: "June 2, 2020"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+
+## Parametric vs nonparametric models
+
+- Given a regressor/predictor $x_1,\ldots,x_n$ and response $y_1, \ldots, y_n$, where
+$$
+y_i = f(x_i) + \epsilon_i,
+$$
+where $\epsilon_i$ are iid with mean zero and unknown variance $\sigma^2$. 
+
+- **Parametric approach** assumes that $f(x)$ belongs to a parametric family $f(x \mid \boldsymbol{\beta})$. Examples are
+\begin{eqnarray*}
+  f(x \mid \boldsymbol{\beta}) &=& \beta_0 + \beta_1 x \\
+  f(x \mid \boldsymbol{\beta}) &=& \beta_0 + \beta_1 x + \beta_2 x^2 \\
+  f(x \mid \boldsymbol{\beta}) &=& \beta_0 + \beta_1 x^{\beta_2}.
+\end{eqnarray*}
+
+- **Nonparametric approach** assumes $f$ is from some smooth family of functions. 
+
+- Nonparametric approaches offers flexible modelling of complex data, and often serve as valuable exploratory data analysis tools to guide formulation of meaningful and effective parametric models.
+
+- Three datasets.
+
+    - `exa`: $f(x) = \sin^3 (2 \pi x^3)$. 
+    ```{r}
+    exa <- as_tibble(exa) %>% print()
+    exa %>%
+      ggplot(mapping = aes(x = x, y = y)) + 
+      geom_point() +
+      geom_smooth(span = 0.2) + # small span give more wiggleness
+      geom_line(mapping = aes(x = x, y = m)) # true model (black line)
+    ```
+
+    - `exb`: $f(x) = 0$. 
+    ```{r}
+    exb <- as_tibble(exb) %>% print()
+    exb %>%
+      ggplot(mapping = aes(x = x, y = y)) + 
+      geom_point() +
+      geom_smooth() +
+      geom_line(mapping = aes(x = x, y = m))
+    ```
+
+    - `faithful`: data on Old Faithful geyser in Yellowstone National Park.
+    ```{r}
+    faithful <- as_tibble(faithful) %>% print()
+    faithful %>%
+      ggplot(mapping = aes(x = eruptions, y = waiting)) + 
+      geom_point() +
+      geom_smooth() # small span give more wiggleness
+    ```
+
+![](./oldfaithful.jpg)
+
+## Kernel estimators
+
+- Moving average estimator
+$$
+\hat f_\lambda(x) = \frac{1}{n\lambda} \sum_{j=1}^n K\left( \frac{x-x_j}{\lambda} \right) Y_j = \frac{1}{n} \sum_{j=1}^n w_j Y_j,
+$$
+where
+$$
+w_j = \lambda^{-1} K\left( \frac{x-x_j}{\lambda} \right),
+$$
+and $K$ is a **kernel** such that $\int K(x) \, dx = 1$. $\lambda$ is called the **bandwidth**, **window width** or **smoothing parameter**.
+
+- When $x$s are spaced unevenly, the kernel estimator can give poor results. This is improved by the **Nadaraya-Watson** estimator
+$$
+f_\lambda(x) = \frac{\sum_{j=1}^n w_j Y_j}{\sum_{j=1}^n w_j}.
+$$
+- Asymptotics of kernel estimators 
+$$
+\text{MSE}(x) = \mathbb{E} [f(x) - \hat f_\lambda(x)]^2 = O(n^{-4/5}).
+$$
+Typical parametric estimator has $\text{MSE}(x) = O(n^{-1})$ _if the parametric model is correct_. 
+
+- Choice of kernel. Ideal kernel is smooth, compact, and amenable to rapid computation. The optimal choice under some standard assumptions is the **Epanechnikov kernel**
+$$
+K(x) = \begin{cases}
+\frac 34 (1 - x^2) & |x| < 1 \\
+0 & \text{otherwise}
+\end{cases}.
+$$
+
+![](https://upload.wikimedia.org/wikipedia/commons/4/47/Kernels.svg)
+
+- Choice of smoothing parameter $\lambda$. Small $\lambda$ gives more wiggly curves, while large $\lambda$ yields smoother curves. 
+
+```{r}
+for (bw in c(0.1, 0.5, 2)) {
+  with(faithful, {
+    plot(waiting ~ eruptions, col = gray(0.75))
+    # Nadaraya–Watson kernel estimate with normal kernel
+    lines(ksmooth(eruptions, waiting, "normal", bw))
+  })
+}
+```
+
+- Cross-valiation (CV) choose the $\lambda$ that minimizes the criterion
+$$
+\text{CV}(\lambda) = \frac 1n \sum_{j=1}^n [y_j - \hat f_{\lambda(j)}(x_j)]^2,
+$$
+where $(j)$ indicates that point $j$ is left out of the fit. 
+
+```{r}
+library(sm)
+
+with(faithful,
+     sm.regression(eruptions, waiting, h = h.select(eruptions, waiting)))
+with(exa, sm.regression(x, y, h = h.select(x, y)))
+with(exb, sm.regression(x, y, h = h.select(x, y)))
+```
+
+## Splines
+
+### Smoothing splines
+
+- Smoothing spline approach chooses $\hat f$ to minize the modified least squares criterion
+$$
+\frac 1n \sum_i [y_i - f(x_i)]^2 + \lambda \int [f''(x)]^2 \, dx,
+$$
+where $\lambda > 0$ is the smoothing paramter and $\int [f''(x)]^2 \, dx$ is a **roughness penalty**. For large $\lambda$, the minimizer $\hat f$ is smoother; for smaller $\lambda$, the minizer $\hat f$ is rougher. This is the **smoothing spline** fit.
+
+- The minimizer takes a special form: $\hat f$ is a cubic spline (piecewise cubic polynomial in each interval $(x_i, x_{i+1})$). 
+
+- The tuning parameter $\lambda$ is chosen by cross-validation (either leave-one-out (LOO) or generalized (GCV)) in R.
+
+```{r}
+with(faithful, {
+  plot(waiting ~ eruptions, col = gray(0.75))
+  lines(smooth.spline(eruptions, waiting), lty = 2)
+})
+```
+
+```{r}
+with(exa, {
+  plot(y ~ x, col = gray(0.75))
+  lines(x, m) # true model
+  lines(smooth.spline(x, y), lty = 2)
+})
+```
+
+```{r}
+with(exb, {
+  plot(y ~ x, col = gray(0.75))
+  lines(x, m) # true model
+  lines(smooth.spline(x, y), lty = 2)
+})
+```
+The last example `exb` shows that automatic choice of tuning parameter is not foolproof.
+
+### Regression splines
+
+- The **regresison spline** fit differs from the smoothing splines in that the number of knots can be much smaller than the sample size. 
+
+- Piecewise linear splines:
+
+```{r}
+# right hockey stick function (RHS) with a knot at c
+rhs <- function(x, c) ifelse(x > c, x - c, 0)
+curve(rhs(x, 0.5), 0, 1)
+```
+
+- Define some knots for Example A
+```{r}
+(knots <- 0:9 / 10)
+```
+and compute a design matrix of splines with knots at these points for each $x$:
+```{r}
+# each column is a RHS function with a specific knot 
+dm <- outer(exa$x, knots, rhs)
+dim(dm)
+matplot(exa$x, dm, type = "l", col = 1, xlab = "x", ylab="")
+```
+
+- Compute and dipslay the regression spline fit.
+```{r}
+lmod <- lm(exa$y ~ dm)
+plot(y ~ x, exa, col = gray(0.75))
+lines(exa$x, predict(lmod))
+```
+
+- We can acheive better fit by using more knots in denser regions of greater curvature.
+```{r}
+newknots <- c(0, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)
+dmn <- outer(exa$x, newknots, rhs)
+lmod <- lm(exa$y ~ dmn)
+plot(y ~ x, data = exa, col = gray(0.75))
+lines(exa$x, predict(lmod))
+```
+
+- High-order splines can produce a smoother fit. The `bs()` function can be used to generate the appropriate spline basis. The default is cubic B-splines.
+```{r}
+library(splines)
+
+matplot(bs(seq(0, 1, length = 1000), df = 12), type = "l", ylab="", col = 1)
+```
+
+```{r}
+# generate design matrix using B-splines with df = 12
+lmod <- lm(y ~ bs(x, 12), exa)
+plot(y ~ x, exa, col = gray(0.75))
+lines(m ~ x, exa) # true model
+lines(predict(lmod) ~ x, exa, lty = 2) # Cubic B-spline fit
+```
+
+## Local polynomials
+
+- Both kernel and spline smoothers are vulnerable to outliers.
+
+- **Local polynomial** method fit a polynomial in a window using robust methods, then the predicted response at the middle of the window is the fitted value. This procedure is repeated by sliding the window over the range of the data. 
+
+- **lowess** (locally weighted scatterplot smoothing) or **loess** (locally estimated scatterplot smoothing) functions in R.
+
+- We need to choose the order of polynomial and window width. Default window width is 0.75 of data. Default polynomial order is 2 (quadratic). 
+
+- Examples.
+
+```{r}
+with(faithful, {
+  plot(waiting ~ eruptions, col = gray(0.75))
+  f <- loess(waiting ~ eruptions)
+  i <- order(eruptions)
+  lines(f$x[i], f$fitted[i])
+})
+```
+
+```{r}
+with(exa, {
+  plot(y ~ x, col = gray(0.75))
+  lines(m ~ x)
+  f <- loess(y ~ x) # default span = 0.75
+  lines(f$x, f$fitted, lty = 2)
+  # try smaller span (proportion of the range)
+  f <- loess(y ~ x, span = 0.22)
+  lines(f$x, f$fitted, lty = 5)
+})
+```
+
+```{r}
+with(exb, {
+  plot(y ~ x, col = gray(0.75))
+  lines(m ~ x) 
+  f <- loess(y ~ x) # default span = 0.75
+  lines(f$x, f$fitted, lty = 2)
+  # span = 1 means whole span of data (smoothest)
+  f <- loess(y ~ x, span = 1)
+  lines(f$x, f$fitted, lty = 5)
+})
+```
+
+- Pointwise confidence band is obtained by the local parametric fit for smoothing splines or loess.
+
+```{r}
+ggplot(data = exa, mapping = aes(x = x, y = y)) +
+  geom_point(alpha = 0.25) + 
+  geom_smooth(method = "loess", span = 0.22) + 
+  geom_line(mapping = aes(x = x, y = m), linetype = 2)
+```
+
+- Simultaneous confidence band can be constructed by the `mgcv` package.
+
+```{r}
+library(mgcv)
+
+ggplot(data = exa, mapping = aes(x = x, y = y)) +
+  geom_point(alpha = 0.25) + 
+  geom_smooth(method = "gam", span = 0.22, formula = y ~ s(x, k = 20)) + 
+  geom_line(mapping = aes(x = x, y = m), linetype = 2)
+```
+
+## Wavelets (**not covered in this course**)
+
+- In general, we approximate a curve by a family of basis functions
+$$
+\hat f(x) = \sum_i c_i \phi_i(x),
+$$
+where the basis functions $\phi_i$ are given and the coefficients $c_i$ are estimated. 
+
+- Ideally we would like the basis functions $\phi_i$ to be (1) compactly supported (adatped to local data points) and (2) orthogonal (fast computing). 
+
+- Orthogonal polynomials and Fourier basis are not compactly supported. 
+
+- Cubic B-splines are compactly supported but not orthogonal. 
+
+- **Wavelets** are both compactly supported and orthogonal. 
+
+- **Haar basis**. The mother wavelet function on [0, 1]
+$$
+w(x) = \begin{cases}
+1 & x \le 1/2 \\
+-1 & x > 1/2
+\end{cases}.
+$$
+Next two members are defined on [0, 1/2) and [1/2, 1) by rescaling the mother wavelet to these two intervals. In general, at level $j$
+$$
+h_n(x) = 2^{j/2} w(2^j x - k),
+$$
+where $n = 2^j + k$ and $0 \le k \le 2^j$. 
+
+```{r}
+library(wavethresh)
+
+wds <- wd(exa$y, filter.number = 1, family = "DaubExPhase")
+draw(wds)
+plot(wds)
+```
+
+Let's only retain 3 levels of coefficients.
+```{r}
+wtd <- threshold(wds, policy = "manual", value = 9999)
+fd <- wr(wtd)
+plot(y ~ x, exa, col = gray(0.75))
+lines(m ~ x, exa)
+lines(fd ~ x, exa, lty = 5, lwd = 2)
+```
+
+Or we can zero out only the small coefficients.
+```{r}
+wtd2 <- threshold(wds)
+fd2 <- wr(wtd2)
+plot(y ~ x, exa, col = gray(0.75))
+lines(m ~ x, exa)
+lines(fd2 ~ x, exa, lty = 5, lwd = 2)
+```
+
+- We may perfer to use continuous wavelet basis functions.
+
+```{r}
+wds <- wd(exa$y, filter.number = 2, bc = "interval")
+draw(filter.number = 2, family = "DaubExPhase")
+plot(wds)
+```
+
+Now we zero out small coefficients.
+```{r}
+wtd <- threshold(wds)
+fd <- wr(wtd)
+plot(y ~ x, exa, col = gray(0.75))
+lines(m ~ x, exa)
+lines(fd ~ x, exa, lty=2)
+```
+
+- For the Old Faithful data.
+
+```{r}
+x <- with(faithful, (eruptions - min(eruptions)) / (max(eruptions) - min(eruptions)))
+gridof <- makegrid(x, faithful$waiting)
+wdof <- irregwd(gridof, bc="symmetric")
+wtof <- threshold(wdof)
+wrof <- wr(wtof)
+plot(waiting ~ eruptions, faithful, col = grey(0.75))
+with(faithful, lines(seq(min(eruptions), max(eruptions), len=512), wrof))
+```
