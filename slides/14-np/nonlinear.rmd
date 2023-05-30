@@ -1,5 +1,5 @@
 ---
-title: "Nonparametric Regression (ELMR Chapter 14)"
+title: "Nonlinear Models (ISL 7)"
 author: "Dr. Jin Zhou @ UCLA"
 date: "May 30, 2023"
 output:
