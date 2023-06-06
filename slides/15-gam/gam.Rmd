@@ -21,7 +21,14 @@ library(tidyverse)
 library(faraway)
 ```
 
+## Additional materials about GAM
+
+- [Generalized Additive Models, An Introduction with R, Second Edition](https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R-Second-Edition/Wood/p/book/9781498728331) by Simon Wood
+
+- Introduction to Generalized Additive Models with R and mgcv [Git](https://github.com/gavinsimpson/intro-gam-webinar-2020), [Youtube](https://www.youtube.com/watch?v=sgw4cu8hrZM&t=970s)
+
 ## Additive models
+
 
 - For $p$ predictors $x_1, \ldots, x_p$, nonparametric regression takes the form
 $$
