@@ -1,6 +1,6 @@
 ---
-title: "Biostat 200C Homework 5 (Partial Answer Key)"
-subtitle: 
+title: "Biostat 200C Homework 5"
+subtitle: "Partial Answer Key"
 output: 
   html_document:
     toc: true
