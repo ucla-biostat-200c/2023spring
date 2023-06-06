@@ -1,0 +1,259 @@
+---
+title: "Biostat 200C Homework 5 (Partial Answer Key)"
+subtitle: 
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+library(tidyverse)
+library(faraway)
+```
+
+
+## Balanced one-way ANOVA random effects model
+
+Consider the balanced one-way ANOVA random effects model with $a$ levels and $n$ observations in each level
+$$
+y_{ij} = \mu + \alpha_i + \epsilon_{ij}, \quad i=1,\ldots,a, \quad j=1,\ldots,n.
+$$
+where $\alpha_i$ are iid from $N(0,\sigma_\alpha^2)$, $\epsilon_{ij}$ are iid from $N(0, \sigma_\epsilon^2)$. 
+
+1. Derive the ANOVA estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. Specifically show that
+\begin{eqnarray*}
+  \mathbb{E}(\bar y_{\cdot \cdot}) &=& \mathbb{E} \left( \frac{\sum_{ij} y_{ij}}{na} \right) = \mu \\
+  \mathbb{E} (\text{SSE}) &=& \mathbb{E} \left[ \sum_{i=1}^a \sum_{j=1}^n (y_{ij} - \bar{y}_{i \cdot})^2 \right] = a(n-1) \sigma_{\epsilon}^2 \\
+  \mathbb{E} (\text{SSA}) &=& \mathbb{E} \left[ \sum_{i=1}^a \sum_{j=1}^n (\bar{y}_{i \cdot} - \bar{y}_{\cdot \cdot})^2 \right] = (a-1)(n \sigma_{\alpha}^2 + \sigma_{\epsilon}^2),
+\end{eqnarray*}
+which can be solved to obtain ANOVA estimate
+\begin{eqnarray*}
+\widehat{\mu} &=& \frac{\sum_{ij} y_{ij}}{na}, \\
+\widehat{\sigma}_{\epsilon}^2 &=& \frac{\text{SSE}}{a(n-1)}, \\
+\widehat{\sigma}_{\alpha}^2 &=& \frac{\text{SSA}/(a-1) - \widehat{\sigma}_{\epsilon}^2}{n}.
+\end{eqnarray*}
+
+2. Derive the MLE estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. Hint: write down the log-likelihood and find the maximizer.
+
+3. (We can make this one optional when you grade) Derive the REML estimate for $\mu$, $\sigma_\alpha^2$, and $\sigma_{\epsilon}^2$. 
+
+4. For all three estimates, check that your results match those we obtained using R for the `pulp` example in class.
+
+#### Solution
+
+\begin{eqnarray*}
+\mathbf{y} = \mathbf{1}_{na} \mu + \begin{pmatrix}
+\mathbf{1}_{n} & & \\
+& \vdots & \\
+& & \mathbf{1}_{n}
+\end{pmatrix} \boldsymbol{\gamma} + \boldsymbol{\epsilon}.
+\end{eqnarray*}
+
+1. ANOVA estimator. First
+$$
+\text{SSE} = \sum_i \sum_j (y_{ij} - \bar y_{i\cdot})^2 = \mathbf{y}^T \mathbf{A}_1 \mathbf{y}
+$$
+where 
+$$
+\mathbf{A}_1 = \begin{pmatrix}
+\mathbf{I}_n - n^{-1} \mathbf{1}_n \mathbf{1}_n^T & & \\
+& \ddots & \\
+& & \mathbf{I}_n - n^{-1} \mathbf{1}_n \mathbf{1}_n^T
+\end{pmatrix}.
+$$
+So
+\begin{eqnarray*}
+\mathbb{E} (\text{SSE}) &=& \mathbb{E} \mathbf{y}^T \mathbf{A}_1 \mathbf{y} \\
+&=& \mathbb{E} \operatorname{tr} \mathbf{A}_1 \mathbf{y} \mathbf{y}^T \\
+&=& \operatorname{tr} \mathbf{A}_1 (\sigma_\alpha^2 \mathbf{Z} \mathbf{Z}^T + \sigma_\epsilon^2 \mathbf{I}_{na}) +  \mu^2 \operatorname{tr} \mathbf{A}_1 \mathbf{1}_{na} \mathbf{1}_{na}^T \\
+&=& 0 + a (n - 1) \sigma_{\epsilon}^2 + 0 \\
+&=& a (n - 1) \sigma_{\epsilon}^2.
+\end{eqnarray*}
+Now 
+$$
+\text{SST} = \mathbf{y}^T \mathbf{A}_0 \mathbf{y},
+$$
+where $\mathbf{A}_0 = \mathbf{I}_{na} - (na)^{-1} \mathbf{1}_{na} \mathbf{1}_{na}^T$. So
+\begin{eqnarray*}
+\mathbb{E}(\text{SST}) &=& \operatorname{tr} \mathbf{A}_0 (\sigma_\alpha^2 \mathbf{Z} \mathbf{Z}^T + \sigma_\epsilon^2 \mathbf{I}_{na}) + \mu^2 \operatorname{tr} \mathbf{A}_0 \mathbf{1}_{na} \mathbf{1}_{na}^T \\
+&=& n (a - 1) \sigma_\alpha^2 + (na - 1) \sigma_{\epsilon}^2 + 0 \\
+&=& n (a - 1) \sigma_\alpha^2 + (na - 1) \sigma_{\epsilon}^2.
+\end{eqnarray*}
+Therefore
+$$
+\mathbb{E}(\text{SSA}) = \mathbb{E}(\text{SST}) - \mathbb{E}(\text{SSE}) = (a - 1)(n \sigma_{\alpha}^2 + \sigma_{\epsilon}^2).
+$$
+
+2. MLE. The log-likelihodd is
+\begin{eqnarray*}
+\ell(\mu, \sigma_{\alpha}^2, \sigma_{\epsilon}^2) &=& - \frac n2 \log(2\pi) - \frac 12 \log \det (\sigma_{\alpha}^2 \mathbf{Z} \mathbf{Z}^T + \sigma_{\epsilon}^2 \mathbf{I}) - \frac 12 (\mathbf{y} - \mathbf{1}_{na} \mu)^T (\sigma_{\alpha}^2 \mathbf{Z} \mathbf{Z}^T + \sigma_{\epsilon}^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{1}_{na} \mu) \\
+&=& \sum_i - \frac 12 \log \det (\sigma_{\alpha}^2 \mathbf{1}_n \mathbf{1}_n^T + \sigma_{\epsilon}^2 \mathbf{I}_n) - \frac 12 (\mathbf{y}_i - \mathbf{1}_{n} \mu)^T (\sigma_{\alpha}^2 \mathbf{1}_n \mathbf{1}_n^T + \sigma_{\epsilon}^2 \mathbf{I}_n)^{-1} (\mathbf{y}_i - \mathbf{1}_{n} \mu).
+\end{eqnarray*}
+By Woodbury formula
+\begin{eqnarray*}
+(\sigma_{\alpha}^2 \mathbf{1}_n \mathbf{1}_n^T + \sigma_{\epsilon}^2 \mathbf{I}_n)^{-1} &=& \sigma_{\epsilon}^{-2} \mathbf{I}_{n} - \frac{\sigma_{\epsilon}^{-2} \sigma_{\alpha}^2}{\sigma_{\epsilon}^2 + n\sigma_{\alpha}^2} \mathbf{1}_n \mathbf{1}_n^T \\
+\det (\sigma_{\alpha}^2 \mathbf{1}_n \mathbf{1}_n^T + \sigma_{\epsilon}^2 \mathbf{I}_n) &=& \sigma_{\epsilon}^{2n} (1 + n \sigma_{\alpha}^2 / \sigma_{\epsilon}^2).
+\end{eqnarray*}
+Let $\lambda = \sigma_\alpha^2 / \sigma_\epsilon^2$, then the log-likelihood is
+\begin{eqnarray*}
+\ell(\mu, \sigma_{\alpha}^2, \sigma_{\epsilon}^2) &=& - \frac{na}{2} \log \sigma_{\epsilon}^2 - \frac{a}{2} \log (1 + n\lambda) - \frac{\sigma_{\epsilon}^{-2}}{2} \text{SST}(\mu) + \frac{\sigma_{\epsilon}^{-2}}{2} \frac{n\lambda}{1 + n \lambda} \text{SSA}(\mu) \\
+&=& - \frac{na}{2} \log \sigma_{\epsilon}^2 - \frac{a}{2} \log (1 + n\lambda) - \frac{\sigma_{\epsilon}^{-2}}{2} \frac{\text{SST}(\mu) + n\lambda \text{SSA}}{1 + n \lambda}.
+\end{eqnarray*}
+Setting derivative with respect to $\mu$ to 0 yields
+$$
+\hat \mu = \bar y_{\cdot \cdot}.
+$$
+Setting derivative with respect to $\sigma_{\epsilon}^2$ to 0 yields equation
+$$
+\sigma_{\epsilon}^2 = \frac{\text{SST} - \frac{n\lambda}{1 + n\lambda} \text{SSA}}{na} = \frac{\text{SST} + n \lambda \text{SSE}}{na(1 + n\lambda)}.
+$$
+Substitution of the above expression into the log-likelihood shows we need to maximize
+\begin{eqnarray*}
+& & - \frac{na}{2} \log \left( \text{SST} - \frac{n\lambda}{1 + n\lambda} \text{SSA} \right) - \frac{a}{2} \log (1 + n\lambda) \\
+&=& - \frac{na}{2} \log \left( \text{SST} + n \lambda \text{SSE} \right) + \frac{(n-1)a}{2} \log (1 + n \lambda).
+\end{eqnarray*}
+Setting derivative to 0 gives the maximizer
+$$
+\hat \lambda = \frac{n-1}{n} \frac{\text{SST}}{\text{SSE}} - 1.
+$$
+Thus
+$$
+\hat \sigma_{\epsilon}^2 = \frac{\text{SST} - \frac{n \hat \lambda}{1 + n \hat \lambda} \text{SSA}}{na} = \frac{\text{SSE}}{(n-1)a}
+$$
+(same as ANOVA estimate) and
+$$
+\hat \sigma_{\alpha}^2 = \frac{\text{SSA}}{an} - \frac{\text{SSE}}{an(n-1)}.
+$$
+
+3. REML. Let $K \in \mathbb{R}^{n \times (n-1)}$ be a basis of ${\cal N}(X^T)$. Then 
+$$
+K^T Y \sim N(0, K^T \Omega K).
+$$
+and the log-likelihood is
+$$
+\, - \frac 12 \log \det K^T \Omega K - \frac 12 y^T K(K^T \Omega K)^{-1} K^T y.
+$$
+Setting the derivative with respect to $\sigma_\alpha^2$ and $\sigma_\epsilon^2$ to 0 yields the estimation equations
+\begin{eqnarray*}
+  \frac{\partial}{\partial \sigma_{\epsilon}^2} \ell &=& - \frac 12 \operatorname{tr} [K(K^T \Omega K)^{-1} K^T] - \frac 12 y^t K(K^T \Omega K)^{-1} K^T K(K^T \Omega K)^{-1} K^T y = 0, \\
+  \frac{\partial}{\partial \sigma_{\alpha}^2} \ell &=& - \frac 12 \operatorname{tr} [K(K^T \Omega K)^{-1} K^T Z Z^T] - \frac 12 y^t K(K^T \Omega K)^{-1} K^T Z Z^T K(K^T \Omega K)^{-1} K^T y = 0.
+\end{eqnarray*}
+It can be shown
+$$
+K(K^T \Omega K)^{-1} K^T = \Omega^{-1} - \Omega^{-1} X (X^T \Omega^{-1} X)^{-1} X^T \Omega^{-1},
+$$
+since both sizes of
+$$
+\Omega^{1/2} K(K^T \Omega K)^{-1} K^T \Omega^{1/2} = I - \Omega^{-1/2} X (X^T \Omega^{-1} X)^{-1} X^T \Omega^{-1/2}
+$$
+are the (unique) orthogonal projection to the space ${\cal C}(X)^\perp = {\cal N}(X^T)$. Let's simplify
+\begin{eqnarray*}
+\mathbf{A} &:=& \Omega^{-1} - \Omega^{-1} X (X^T \Omega^{-1} X)^{-1} X^T \Omega^{-1} \\
+&=& \Omega^{-1} - \frac{(1 + n \lambda) \sigma_{\epsilon}^2}{na} \Omega^{-1} X X^T \Omega^{-1} \\
+&=& \Omega^{-1} - \frac{(1 + n \lambda) \sigma_{\epsilon}^2}{na} \left( \frac{\sigma_{\epsilon}^{-2}}{1 + n \lambda} \right)^2 \mathbf{1}_{na} \mathbf{1}_{na}^T \\
+&=& \Omega^{-1} - \frac{\sigma_{\epsilon}^{-2}}{na(1 + n \lambda)} \mathbf{1}_{na} \mathbf{1}_{na}^T \\
+&=& \sigma_\epsilon^{-2} \mathbf{I}_{na} - \frac{\sigma_\epsilon^{-2} \lambda}{1 + n\lambda} \mathbf{Z} \mathbf{Z}^T - \frac{\sigma_{\epsilon}^{-2}}{na(1 + n \lambda)} \mathbf{1}_{na} \mathbf{1}_{na}^T, \\
+\mathbf{A}^2 &=& \sigma_{\epsilon}^{-4} \left( \mathbf{I}_{na} - \frac{\lambda}{1 + n\lambda} \mathbf{Z} \mathbf{Z}^T - \frac{1}{na(1 + n \lambda)} \mathbf{1}_{na} \mathbf{1}_{na}^T \right) \left( \mathbf{I}_{na} - \frac{\lambda}{1 + n\lambda} \mathbf{Z} \mathbf{Z}^T - \frac{1}{na(1 + n \lambda)} \mathbf{1}_{na} \mathbf{1}_{na}^T \right) \\
+&=& \sigma_{\epsilon}^{-4} \left( \mathbf{I}_{na} + \frac{n\lambda^2}{(1 + n \lambda)^2} \mathbf{Z} \mathbf{Z}^T + \frac{1}{na(1 + n\lambda)^2} \mathbf{1}_{na} \mathbf{1}_{na}^T - \frac{2\lambda}{1 + n\lambda} \mathbf{Z} \mathbf{Z}^T - \frac{2}{na(1+n\lambda)} \mathbf{1}_{na} \mathbf{1}_{na}^T + \frac{2\lambda}{a(1+n\lambda)^2} \mathbf{1}_{na} \mathbf{1}_{na}^T \right) \\
+&=& \sigma_{\epsilon}^{-4} \left( \mathbf{I}_{na} - \frac{2\lambda + n\lambda^2}{(1 + n\lambda)^2} \mathbf{Z} \mathbf{Z}^T - \frac{1}{na(1 + n\lambda)^2} \mathbf{1}_{na} \mathbf{1}_{na}^T \right), \\
+\mathbf{A} \mathbf{Z} \mathbf{Z}^T \mathbf{A} &=& 
+\end{eqnarray*}
+The first estimation equations becomes
+\begin{eqnarray*}
+  \frac{\partial}{\partial \sigma_{\epsilon}^2} \ell &=& - \frac 12 \operatorname{tr} \mathbf{A} - \frac 12 \mathbf{y}^T \mathbf{A} \mathbf{A} \mathbf{y} \\
+  &=& - \frac{na}{2} \sigma_{\epsilon}^{-2} + \frac{na\lambda}{2(1 + n \lambda)} \sigma_{\epsilon}^{-2} + \frac{1}{2(1 + n\lambda)} \sigma_{\epsilon}^{-2} \\
+  &=& 0.
+\end{eqnarray*}
+
+## Estimation of random effects
+
+1. Assume the conditional distribution
+$$
+\mathbf{y} \mid \boldsymbol{\gamma} \sim N(\mathbf{X} \boldsymbol{\beta} + \mathbf{Z} \boldsymbol{\gamma}, \sigma^2 \mathbf{I}_n)
+$$
+and the prior distribution
+$$
+\boldsymbol{\gamma} \sim N(\mathbf{0}_q, \boldsymbol{\Sigma}).
+$$
+Then by the Bayes theorem, the posterior distribution is
+\begin{eqnarray*}
+f(\boldsymbol{\gamma} \mid \mathbf{y}) &=& \frac{f(\mathbf{y} \mid \boldsymbol{\gamma}) \times f(\boldsymbol{\gamma})}{f(\mathbf{y})}, \end{eqnarray*}
+where $f$ denotes corresponding density. Show that the posterior distribution is a multivariate normal with mean
+$$
+\mathbb{E} (\boldsymbol{\gamma} \mid \mathbf{y}) = \boldsymbol{\Sigma} \mathbf{Z}^T (\mathbf{Z} \boldsymbol{\Sigma} \mathbf{Z}^T + \sigma^2 \mathbf{I})^{-1} (\mathbf{y} - \mathbf{X} \boldsymbol{\beta}).
+$$
+
+2. For the balanced one-way ANOVA random effects model, show that the posterior mean of random effects is always a constant (less than 1) multiplying the corresponding fixed effects estimate.
+
+#### Solution
+
+$$
+f(y \mid \gamma) = \frac{1}{(2\pi \sigma^2)^{n/2}} e^{-\frac{\|y - X \beta - Z \gamma\|^2}{2\sigma^2}}
+$$
+
+$$
+f(\gamma) = \frac{1}{(2 \pi)^{q/2} (\det \Sigma)^{1/2}} e^{- \frac{\gamma^T \Sigma \gamma}{2}}.
+$$
+So 
+\begin{eqnarray*}
+f(\gamma \mid y) &\propto& f(y \mid \gamma) f(\gamma) \\
+&\propto& e^{- \frac{\|y - X \beta - Z \gamma\|^2}{2\sigma^2} - \frac{\gamma^T \Sigma \gamma}{2}}
+\end{eqnarray*}
+Focusing on the exponent,
+\begin{eqnarray*}
+  & & \sigma^{-2} \gamma^T Z^T Z \gamma - 2 \sigma^{-2} \gamma^T Z^T (y - X \beta) + \gamma^T \Sigma \gamma \\
+  &=& \gamma^T (\sigma^{-2} Z^T Z + \Sigma^{-1}) \gamma - 2 \sigma^{-2} \gamma^T Z^T (y - X \beta) \\
+  &=& \gamma^T (\sigma^{-2} Z^T Z + \Sigma^{-1}) \gamma - 2 \sigma^{-2} \gamma^T (\sigma^{-2} Z^T Z + \Sigma^{-1}) (\sigma^{-2} Z^T Z + \Sigma^{-1})^{-1 } Z^T (y - X \beta).
+\end{eqnarray*}
+It's clear the covariance of posterior normal distribution is 
+$$
+(\sigma^{-2} Z^T Z + \Sigma^{-1})^{-1} = \Sigma - \Sigma Z^T (\sigma^2 I_n + Z_i Z_i^T)^{-1} Z_i \Sigma.
+$$
+Now by binomial inversion formula
+\begin{eqnarray*}
+  & & \sigma^{-2} (\sigma^{-2} Z^T Z + \Sigma^{-1})^{-1 } Z^T (y - X \beta) \\
+  &=& \sigma^{-2} [\Sigma Z^T - \Sigma Z^T (Z \Sigma Z^T + \sigma^2 I)^{-1} Z \Sigma Z^T] (y - X \beta) \\
+  &=& \sigma^{-2} \Sigma Z^T [I - (Z \Sigma Z^T + \sigma^2 I)^{-1} Z \Sigma Z^T] (y - X \beta) \\
+  &=& \sigma^{-2} \Sigma Z^T [(Z \Sigma Z^T + \sigma^2 I)^{-1} (Z \Sigma Z^T + \sigma^2 I) - (Z \Sigma Z^T + \sigma^2 I)^{-1} Z \Sigma Z^T] (y - X \beta) \\
+  &=& \Sigma Z^T (Z \Sigma Z^T + \sigma^2 I)^{-1} (y - X \beta).
+\end{eqnarray*}
+
+Specializing to the balanced one-way ANOVA case, the conditional mean is
+\begin{eqnarray*}
+& & \sigma_{\epsilon}^{-2} (\sigma_{\epsilon}^{-2} Z^T Z + \Sigma_{\epsilon}^{-1})^{-1 } Z^T (y - X \beta) \\
+&=& \sigma_{\epsilon}^{-2} (n \sigma_{\epsilon}^{-2} + \sigma_{\alpha}^{-2})^{-1} Z^T (y - \hat \mu 1) \\
+&=& \frac{n}{n + (\sigma_{\epsilon}/\sigma_{\alpha})^2} \begin{pmatrix}
+ y_{1\cdot} - \hat \mu \\
+\vdots \\
+y_{a\cdot} - \hat \mu
+\end{pmatrix} \\
+&=& \frac{1}{1 + n^{-1}(\sigma_{\epsilon}/\sigma_{\alpha})^2} \begin{pmatrix}
+\hat \alpha_1 \\
+\vdots \\
+\hat \alpha_a
+\end{pmatrix}.
+\end{eqnarray*}
+
+For fixed effects with sum-to-zero coding,
+$$
+X = \begin{pmatrix}
+\mathbf{1}_{n} & \mathbf{1}_{n} & & & \\
+\mathbf{1}_{n} & & & & \\
+\vdots & & \ddots &  \\
+\mathbf{1}_{n} & & & \mathbf{1}_{n} \\
+\mathbf{1}_{n} & -\mathbf{1}_{n} & \cdots & -\mathbf{1}_{n}
+\end{pmatrix}.
+$$
+The fixed effect estimate is
+$$
+\hat \beta = (X^T X)^{-1} X^T y = \begin{pmatrix}
+\bar y_{\cdot \cdot} \\
+\bar y_{1 \cdot} - \bar y_{\cdot \cdot} \\
+\vdots \\
+\bar y_{a-1,\cdot} - \bar y_{\cdot \cdot}
+\end{pmatrix}.
+$$
+
+
