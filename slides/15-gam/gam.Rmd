@@ -1,0 +1,244 @@
+---
+title: "Generalized Additive Model (ELMR Chapter 15)"
+author: "Dr. Jin Zhou @ UCLA"
+date: "June 1, 2023"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+subtitle: Biostat 200C
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = 'center', cache = FALSE)
+```
+
+Display system information and load `tidyverse` and `faraway` packages
+```{r}
+sessionInfo()
+library(tidyverse)
+library(faraway)
+```
+
+## Additive models
+
+- For $p$ predictors $x_1, \ldots, x_p$, nonparametric regression takes the form
+$$
+y = f(x_1, \ldots, x_p) + \epsilon.
+$$
+For $p$ larger than two or three, it becomes impractical to fit such models due to large sample size requirements. 
+
+- A simplified model is the **additive model**
+$$
+y = \beta_0 + \sum_{j=1}^p f_j(x_j) + \epsilon,
+$$
+where $f_j$ are smooth functions. Interaction terms are ignored. To incorporate categorical predictors, we can use the model
+$$
+y = \beta_0 + \sum_{j=1}^p f_j(x_j) + \mathbf{z}^T \boldsymbol{\gamma} + \epsilon,
+$$
+where $\mathbf{z}$ are categorical predictors.
+
+- There are several packages in R that can fit additive models: `gam`, `mgcv` (included in default installation of R), and `gss`.
+
+- `gam` package uses a **backfitting algorithm** for fitting the additive models.
+
+    1. Initialize $\beta_0 = \bar y$, $f_j(x_j) = \hat \beta_j x_j$ say from the least squares fit.  
+    
+    2. Cycle throught $j=1,\ldots,p, 1,\ldots,p,\ldots$
+    $$
+    f_j = S(x_j, y - \beta_0 - \sum_{i \ne j} f_i(X_i)),
+    $$
+    where $S(x,y)$ means the smooth on the data $(x, y)$. User specifies the smoother being used. 
+    
+    The algorithm is iterated until convergence. 
+
+- `mgcv` package employs a penalized smoothing spline approach. Suppose
+$$
+f_j(x) = \sum_i \beta_i \phi_i(x)
+$$
+for a family of spline basis functions, $\phi_i$. The roughness penalty $\int [f_j''(x)]^2 \, dx$ translates to the term $\boldsymbol{\beta}_j^T \mathbf{S}_j \boldsymbol{\beta}_j$ for a suitable $\mathbf{S}_j$ that depends on the choice of basis. It then maximizes the penalized log-likelihood
+$$
+\log L(\boldsymbol{\beta}) - \sum_j \lambda_j \boldsymbol{\beta}_j^T \mathbf{S}_j \boldsymbol{\beta}_j,
+$$
+where $\lambda_j$ control the amount of smoothing for each variable. Generalized cross-validation (GCV) is used to select the $\lambda_j$s. 
+
+    
+## LA ozone concentration
+
+- The response is `O3` (ozone level). The predictors are `temp` (temperature at El Monte), `ibh` (inversion base height at LAX), and `ibt` (inversion top temperature at LAX). 
+```{r}
+ozone <- as_tibble(ozone) %>% print()
+```    
+
+- Numerical summary.
+```{r}
+summary(ozone)
+```
+
+- Graphical summary. 
+```{r}
+ozone %>%
+  ggplot(mapping = aes(x = temp, y = O3)) + 
+  geom_point(size = 1) + 
+  geom_smooth()
+```
+
+```{r}
+ozone %>%
+  ggplot(mapping = aes(x = ibh, y = O3)) + 
+  geom_point(size = 1) + 
+  geom_smooth()
+```
+
+```{r}
+ozone %>%
+  ggplot(mapping = aes(x = ibt, y = O3)) + 
+  geom_point(size = 1) + 
+  geom_smooth()
+```
+
+- As a reference, let's fit a linear model
+```{r}
+olm <- lm(O3 ~ temp + ibh + ibt, data = ozone)
+summary(olm)
+```
+
+
+<!-- - Effects of predictors.  -->
+
+<!-- ```{r} -->
+<!-- library(effects) -->
+<!-- plot(Effect("temp", olm, partial.residuals = TRUE)) -->
+<!-- plot(Effect("ibh",  olm, partial.residuals = TRUE)) -->
+<!-- plot(Effect("ibt",  olm, partial.residuals = TRUE)) -->
+<!-- ``` -->
+
+- Additive model using `mgcv`.
+
+```{r}
+library(mgcv)
+
+ammgcv <- gam(O3 ~ s(temp) + s(ibh) + s(ibt), data = ozone)
+summary(ammgcv)
+```
+Effective degrees of freedom is calculated as the trace of projection matrices. An approximate F test gives the significance of predictors.
+
+
+- We can exmine the transformations being used.
+
+```{r}
+plot(ammgcv, residuals = TRUE, select = 1)
+plot(ammgcv, residuals = TRUE, select = 2)
+plot(ammgcv, residuals = TRUE, select = 3)
+```
+
+- `ibt` is not significant after adjusting for the effects of `temp` and `ibh`, so we drop it in following analysis.
+
+- We can test the significance of the nonlinearity of a predictor by F test.
+
+```{r}
+am1 <- gam(O3 ~ s(temp) + s(ibh), data = ozone)
+am2 <- gam(O3 ~    temp + s(ibh), data = ozone)
+anova(am2, am1, test = "F")
+```
+
+- We can include functions of two variables with `mgcv` to incorporate interactions. In the *isotropic* case (same scale), we can impose same smoothing on both variables. In the *anisotropic* case (different scales), we use tensor product to allow different smoothings.
+
+```{r}
+# te(x1, x2) play the role x1 * x2 in regular lm/glm
+amint <- gam(O3 ~ te(temp, ibh), data = ozone)
+summary(amint)
+```
+
+- We can test the significance of the interactions using F test.
+
+```{r}
+anova(am1, amint, test = "F")
+```
+
+- We can visualize the interactions
+
+```{r}
+plot(amint, select = 1)
+vis.gam(amint, theta = -45, color = "gray")
+```
+
+- GAM can be used for prediction.
+
+```{r}
+predict(am1, data.frame(temp = 60, ibh = 2000, ibt = 100), se = T)
+```
+```{r}
+# extrapolation
+predict(am1, data.frame(temp = 120, ibh = 2000, ibt = 100), se = T)
+```
+
+### Generalized additive model
+
+- Combining GLM and additive model yields the **generalized additive models (GAMs)**. The systematic component (linear predictor) becomes
+$$
+\eta = \beta_0 + \sum_{j=1}^p f_j(X_j).
+$$
+
+- For example, we an fit the `ozone` data using a Poisson additive model. Setting `scale = -1` tells the function to fit overdispersion parameter as well. 
+
+```{r}
+gammgcv <- gam(O3 ~ s(temp) + s(ibh) + s(ibt), family = poisson, scale = -1, data = ozone)
+summary(gammgcv)
+```
+
+```{r}
+plot(gammgcv, residuals = TRUE, select = 1)
+plot(gammgcv, residuals = TRUE, select = 2)
+plot(gammgcv, residuals = TRUE, select = 3)
+```
+
+## Generalized additive mixed model (GAMM)
+
+- GAMM combine the three major themes in this class. 
+
+- Let's re-analyze the `eplepsy` data from the GLMM chapter. 
+
+```{r}
+egamm <- gamm(seizures ~ offset(timeadj) + treat * expind + s(age), 
+              family   = poisson, 
+              random   = list(id = ~1), 
+              data     = epilepsy,  
+              subset   = (id != 49))
+summary(egamm$gam)
+```
+
+## Multivariate adaptive regression splines (MARS) (**not covered in this course**)
+
+- MARS fits data by model
+$$
+\hat f(x) = \sum_{j=1}^k c_j B_j(x),
+$$
+where the basis functions $B_j(x)$ are formed from products of terms $[\pm (x_i - t)]_+^q$. 
+
+- By default, only additive (first-order) predictors are allowed. 
+
+```{r}
+library(earth)
+
+mmod <- earth(O3 ~ ., data = ozone)
+summary(mmod)
+```
+
+- We can restrict the model size
+```{r}
+mmod <- earth(O3 ~ ., ozone, nk = 7)
+summary(mmod)
+```
+
+- We can also include second-order (two-way) interaction term. Compare with the additive model approach. There are 9 predictors with 36 possible two-way interaction terms, which is complex to estimate and interpret. 
+
+```{r}
+mmod <- earth(O3 ~ ., ozone, nk = 7, degree = 2)
+summary(mmod)
+```
+
+```{r}
+plotmo(mmod)
+```
