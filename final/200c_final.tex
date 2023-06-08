@@ -1,0 +1,436 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Biostat 200C Final},
+  pdfauthor={FirstName LastName (UID XXX-XXX-XXX)},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Biostat 200C Final}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Due June 16, 2023 @ 11:59PM}
+\author{FirstName LastName (UID XXX-XXX-XXX)}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+This is an open book test. Helping or asking help from others is
+considered plagiarism.
+
+\hypertarget{q1.-25-pts-survival-data-analysis}{%
+\subsection{Q1. (25 pts) Survival data
+analysis}\label{q1.-25-pts-survival-data-analysis}}
+
+Consider following survival times of 25 patients with no history of
+chronic diesease (\texttt{chr\ =\ 0}) and 25 patients with history of
+chronic disease (\texttt{chr\ =\ 1}).
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Manually fill in the missing information in the following tables of
+  ordered failure times for groups 1 (\texttt{chr\ =\ 0}) and 2
+  (\texttt{chr\ =\ 1}). Explain how survival probabilities (last column)
+  are calculated.
+\end{enumerate}
+
+Group 1 (\texttt{chr\ =\ 0}):
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule()
+time & n.risk & n.event & survival \\
+\midrule()
+\endhead
+1.8 & 25 & 1 & 0.96 \\
+2.2 & 24 & 1 & 0.92 \\
+2.5 & 23 & 1 & 0.88 \\
+2.6 & 22 & 1 & 0.84 \\
+3.0 & 21 & 1 & 0.80 \\
+3.5 & 20 & \textbf{???} & \textbf{???} \\
+3.8 & 19 & 1 & 0.72 \\
+5.3 & 18 & 1 & 0.68 \\
+5.4 & 17 & 1 & 0.64 \\
+5.7 & 16 & 1 & 0.60 \\
+6.6 & 15 & 1 & 0.56 \\
+8.2 & 14 & 1 & 0.52 \\
+8.7 & 13 & 1 & 0.48 \\
+9.2 & \textbf{???} & \textbf{???} & \textbf{???} \\
+9.8 & 10 & 1 & 0.36 \\
+10.0 & 9 & 1 & 0.32 \\
+10.2 & 8 & 1 & 0.28 \\
+10.7 & 7 & 1 & 0.24 \\
+11.0 & 6 & 1 & 0.20 \\
+11.1 & 5 & 1 & 0.16 \\
+11.7 & 4 & \textbf{???} & \textbf{???} \\
+\bottomrule()
+\end{longtable}
+
+Group 2 (\texttt{chr\ =\ 1}):
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule()
+time & n.risk & n.event & survival \\
+\midrule()
+\endhead
+1.4 & 25 & 1 & 0.96 \\
+1.6 & 24 & 1 & 0.92 \\
+1.8 & 23 & 1 & 0.88 \\
+2.4 & 22 & 1 & 0.84 \\
+2.8 & 21 & 1 & 0.80 \\
+2.9 & 20 & 1 & 0.76 \\
+3.1 & 19 & 1 & 0.72 \\
+3.5 & 18 & 1 & 0.68 \\
+3.6 & 17 & 1 & 0.64 \\
+3.9 & \textbf{???} & \textbf{???} & \textbf{???} \\
+4.1 & \textbf{???} & \textbf{???} & \textbf{???} \\
+4.2 & \textbf{???} & \textbf{???} & \textbf{???} \\
+4.7 & 13 & 1 & 0.48 \\
+4.9 & 12 & 1 & 0.44 \\
+5.2 & 11 & 1 & 0.40 \\
+5.8 & 10 & 1 & 0.36 \\
+5.9 & 9 & 1 & 0.32 \\
+6.5 & 8 & 1 & 0.28 \\
+7.8 & 7 & 1 & 0.24 \\
+8.3 & 6 & 1 & 0.20 \\
+8.4 & 5 & 1 & 0.16 \\
+8.8 & 4 & 1 & 0.12 \\
+9.1 & \textbf{???} & \textbf{???} & 0.08 \\
+9.9 & \textbf{???} & \textbf{???} & 0.04 \\
+11.4 & 1 & 1 & 0.00 \\
+\bottomrule()
+\end{longtable}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  Use R to display the Kaplan-Meier survival curves for groups 1
+  (\texttt{chr\ =\ 0}) and 2 (\texttt{chr\ =\ 1}).
+\item
+  Write down the log-likelihood of the parametric exponential
+  (proportional hazard) model for survival times. Explain why this model
+  can be fit as a generalized linear model with offset.
+\item
+  Fit the exponential (proportional hazard) model on the \texttt{chr}
+  data using R. Interpret the coefficients.
+\item
+  Comment on the limitation of exponential model compared to other more
+  flexible models such as Weibull.
+\end{enumerate}
+
+\hypertarget{q2.-35-pts-longitudinal-data-analysis}{%
+\subsection{Q2. (35 pts) Longitudinal data
+analysis}\label{q2.-35-pts-longitudinal-data-analysis}}
+
+This question is adapted from Exercise 13.1 of ELMR (p294).
+
+The \texttt{ohio} data concerns 536 children from Steubenville, Ohio and
+were taken as part of a study on the effects of air pollution. Children
+were in the study for 4 years from ages 7 to 10. The response was
+whether they wheezed (difficulty with breathing) or not. The variables
+are
+
+\begin{itemize}
+\item
+  \texttt{resp}: an indicator of wheeze status (1 = yes, 0 = no)
+\item
+  \texttt{id}: an identifier for the child
+\item
+  \texttt{age}: 7 yrs = -2, 8 yrs = -1, 9 yrs = 0, 10 yrs = 1
+\item
+  \texttt{smoke}: an indicator of maternal smoking status at the first
+  year of the study (1 = smoker, 0 = non-smoker).
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Construct a table that shows proportion of children who wheeze for 0,
+  1, 2, 3 or 4 years broken down by maternal smoking status.
+\item
+  Make a plot which shows how the proportion of children wheezing
+  changes by age with a separate line for smoking and nonsmoking
+  mothers.
+\item
+  Group the data by child to count the total (out of four) years of
+  wheezing. Fit a binomial GLM to this response to check for a maternal
+  smoking effect. Does this prove there is a smoking effect or could
+  there be another plausible explanation? Discuss the potential issue of
+  using GLM here.
+\item
+  Fit a model for each individual response using a GLMM fit using
+  penalized quasi-likelihood. Interpret the coefficients of age and
+  maternal smoking. How do the odds of wheezing change numerically over
+  time? Explain what you observe in the output AIC, BIC, and logLik.
+\item
+  Now fit the same model but using adaptive Gaussian-Hermit quadrature
+  (with 25 knots). Compare to the previous model fit. Interpret the
+  fixed effect coefficients. Interpret the variance component estimates.
+  What is the odds ratio for wheezing comparing a smoking mother
+  (\texttt{smoke\ =\ 1}) vs a non-smoking mother (\texttt{smoke\ =\ 0})
+  and its 95\% confidence interval.
+\item
+  Fit the model using GEE. Use an autoregressive rather than
+  exchangeable error structure. Explain the underlying assumptions of
+  the autoregressive correlation structure. Does the GLMM approach in 5
+  assumes the same correlation structure within each cluster/individual?
+  Compare the results to the previous model fits. In your model, what
+  indicates that a child who already wheezes is likely to continue to
+  wheeze? What happens if we misspecified the correlation structure?
+\item
+  What is your overall conclusion regarding the effect of age and
+  maternal smoking? Can we trust the GLM result or are the GLMM models
+  preferable?
+\end{enumerate}
+
+\hypertarget{q3.-40-pts-lmm-and-gamm}{%
+\subsection{Q3. (40 pts) LMM and GAMM}\label{q3.-40-pts-lmm-and-gamm}}
+
+This question is adapted from Exercise 11.2 of ELMR (p251). Read the
+documentation of the dataset \texttt{hprice} in Faraway package before
+working on this problem.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Make a plot of the data on a single panel to show how housing prices
+  increase by year. Describe what can be seen in the plot.
+\item
+  Fit a linear model with the (log) house price as the response and all
+  other variables (except msa) as fixed effect predictors. Which terms
+  are statistically significant? Discuss the coefficient for time.
+\item
+  Make a plot that shows how per-capita income changes over time. What
+  is the nature of the increase? Make a similar plot to show how income
+  growth changes over time. Comment on the plot.
+\item
+  Create a new variable that is the per-capita income for the first time
+  period for each MSA. Refit the same linear model but now using the
+  initial income and not the income as it changes over time. Compare the
+  two models.
+\item
+  Fit a mixed effects model that has a random intercept for each MSA.
+  Why might this be reasonable? The rest of the model should have the
+  same structure as in the previous question. Make a numerical
+  interpretation of the coefficient of time in your model. Explain the
+  difference between REML and MLE methods.
+\item
+  Fit a model that omits the adjacent to water and rent control
+  predictors. Test whether this reduction in the model can be supported.
+\item
+  It is possible that the increase in prices may not be linear in year.
+  Fit an additive mixed model where smooth is added to year. Make a plot
+  to show how prices have increased over time.
+\item
+  Interpret the coefficients in the previous model for the initial
+  annual income, growth and regulation predictors.
+\end{enumerate}
+
+\hypertarget{optional-extra-credit-problem}{%
+\subsection{Optional Extra Credit
+Problem*}\label{optional-extra-credit-problem}}
+
+\begin{quote}
+\begin{quote}
+This problem is meant to offer another chance to demonstrate
+understanding of some of the material on the mid-term. If you choose to
+do this problem and your score is higher than your mid-term grade, then
+your mid-term grade will be reweighted to be
+\texttt{New\ Midterm\ Grade\ =\ .8*Old\ Midterm\ Grade\ +\ .2*Extra\ Credit\ Problem}
+\end{quote}
+\end{quote}
+
+The following table shows numbers of beetles dead after five hours
+exposure to gaseous carbon disulphide at various concentrations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(beetle }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{dose =} \FunctionTok{c}\NormalTok{(}\FloatTok{1.6907}\NormalTok{, }\FloatTok{1.7242}\NormalTok{, }\FloatTok{1.7552}\NormalTok{, }\FloatTok{1.7842}\NormalTok{, }\FloatTok{1.8113}\NormalTok{, }\FloatTok{1.8369}\NormalTok{, }\FloatTok{1.8610}\NormalTok{, }\FloatTok{1.8839}\NormalTok{),}
+                 \AttributeTok{beetles =} \FunctionTok{c}\NormalTok{(}\DecValTok{59}\NormalTok{, }\DecValTok{60}\NormalTok{, }\DecValTok{62}\NormalTok{, }\DecValTok{56}\NormalTok{, }\DecValTok{63}\NormalTok{, }\DecValTok{59}\NormalTok{, }\DecValTok{62}\NormalTok{, }\DecValTok{60}\NormalTok{),}
+                 \AttributeTok{killed =} \FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{, }\DecValTok{13}\NormalTok{, }\DecValTok{18}\NormalTok{, }\DecValTok{28}\NormalTok{, }\DecValTok{52}\NormalTok{, }\DecValTok{53}\NormalTok{, }\DecValTok{61}\NormalTok{, }\DecValTok{60}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 8 x 3
+##    dose beetles killed
+##   <dbl>   <dbl>  <dbl>
+## 1  1.69      59      6
+## 2  1.72      60     13
+## 3  1.76      62     18
+## 4  1.78      56     28
+## 5  1.81      63     52
+## 6  1.84      59     53
+## 7  1.86      62     61
+## 8  1.88      60     60
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Let \(x_i\) be \texttt{dose}, \(n_i\) be the number of beetles, and
+  \(y_i\) be the number of killed. Plot the proportions
+  \(p_i = y_i/n_i\) plotted against dose \(x_i\).
+\item
+  We fit a logistic model to understand the relationship between dose
+  and the probably of being killed. Write out the logistic model and
+  associated log-likelihood function.
+\item
+  Derive the scores, \(\mathbf{U}\), with respect to parameters in the
+  above logistic model. (Hint there are two parameters)
+\item
+  Derive the information matrix, \(\mathcal{I}\) (Hint, a \(2\times 2\)
+  matrix)
+\item
+  Maximum likelihood estimates are obtained by solving the iterative
+  equation
+\end{enumerate}
+
+\[
+\mathcal{I}^{(m-1)}\mathbf{b}^{(m)} = \mathcal{I}^{(m-1)}\mathbf{b}^{(m-1)}+ \mathbf{U}^{(m-1)}
+\] where \(\mathbf{b}\) is the vector of estimates. Starting with
+\(\mathbf{b}^{(0)} = 0\), implement this algorithm to show successive
+iterations are
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule()
+Iterations & \(\beta_1\) & \(\beta_2\) & log-likelihood \\
+\midrule()
+\endhead
+0 & 0 & 0 & -333.404 \\
+1 & -37.856 & 21.337 & -200.010 \\
+2 & -53.853 & 30.384 & -187.274 \\
+3 & & & \\
+4 & & & \\
+5 & & & \\
+6 & -60.717 & 34.270 & -186.235 \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\item
+  If after 6 steps, the model converged. For this final model, calculate
+  the deviance. What is the distribution the deviance has?
+\item
+  Does the model fit the data well? justify your answer.
+\end{itemize}
+
+\end{document}

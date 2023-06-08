@@ -1,0 +1,277 @@
+---
+title: "Machine Learning Workflow: Regression Trees"
+subtitle: "Biostat 200C"
+author: "Dr. Jin Zhou @ UCLA"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4  
+engine: knitr
+knitr:
+  opts_chunk: 
+    fig.align: 'center'
+    # fig.width: 6
+    # fig.height: 4
+    message: FALSE
+    cache: false
+---
+
+## Load useful packages
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(gt)
+library(patchwork)
+library(tictoc)
+library(ISLR2)
+library(janitor)
+
+# Load dunnr R package and set the ggplot theme
+library(dunnr)
+# extrafont::loadfonts(device = "win", quiet = TRUE)
+# theme_set(theme_td_minimal())
+# set_geom_fonts()
+# set_palette()
+```
+
+## Overview
+
+![](https://www.tidymodels.org/start/resampling/img/resampling.svg)
+
+
+We illustrate the typical machine learning workflow for regression trees using the `Hitters` data set from R `ISLR2` package. 
+
+1. Initial splitting to test and non-test sets.
+
+2. Pre-processing of data: not much is needed for regression trees.
+
+3. Tune the cost complexity pruning hyper-parameter(s) using 6-fold cross-validation (CV) on the non-test data.
+
+4. Choose the best model by CV and refit it on the whole non-test data.
+
+5. Final prediction on the test data.
+
+## Hitters data
+
+A documentation of the `Hitters` data is [here](https://www.rdocumentation.org/packages/ISLR2/versions/1.3-2/topics/Hitters). The goal is to predict the log(Salary) (at opening of 1987 season) of MLB players from their performance metrics in the 1986-7 season.
+
+```{r}
+hitters <- ISLR2::Hitters %>% janitor::clean_names()
+
+# As per the text, we remove missing `salary` values and log-transform it
+hitters <- hitters %>%
+  filter(!is.na(salary)) %>%
+  mutate(salary = log(salary))
+
+glimpse(hitters)
+```
+```{r}
+# install.packages("tree")
+library(tree)
+
+hitters_tree <- tree(salary ~ years + hits, data = hitters,
+                     # In order to limit the tree to just two partitions,
+                     #  need to set the `control` option
+                     control = tree.control(nrow(hitters), minsize = 100))
+```
+
+Use the built-in plot() to visualize the tree in Figure 8.1:
+
+```{r}
+plot(hitters_tree)
+text(hitters_tree)
+```
+To work with the regions, there is no `broom::tidy()` method for tree objects, but we can get the cuts from the `frame$splits` object:
+
+```{r}
+hitters_tree$frame$splits
+```
+
+
+```{r}
+splits <- hitters_tree$frame$splits %>%
+  as_tibble() %>%
+  filter(cutleft != "") %>%
+  mutate(val = readr::parse_number(cutleft)) %>%
+  pull(val)
+splits
+```
+
+```{r}
+hitters %>%
+  ggplot2::ggplot(aes(x = years, y = hits)) +
+  geom_point(color = td_colors$nice$soft_orange) +
+  geom_vline(xintercept = splits[1], size = 1, color = "forestgreen") +
+  geom_segment(aes(x = splits[1], xend = 25, y = splits[2], yend = splits[2]),
+               size = 1, color = "forestgreen") +
+  annotate("text", x = 10, y = 50, label = "R[2]", size = 6, parse = TRUE) +
+  annotate("text", x = 10, y = 200, label = "R[3]", size = 6, parse = TRUE) +
+  annotate("text", x = 2, y = 118, label = "R[1]", size = 6, parse = TRUE) +
+  coord_cartesian(xlim = c(0, 25), ylim = c(0, 240)) +
+  scale_x_continuous(breaks = c(1, 4.5, 24)) +
+  scale_y_continuous(breaks = c(1, 117.5, 238))
+```
+The regions $R_1$, $R_2$, and $R_3$ are known as terminal nodes or leaves of the tree. The splits along the way are referred to as internal nodes – the connections between nodes are called branches.
+
+A key advantage of a simple decision tree like this is its ease of interpretation:
+
+>> We might interpret the regression tree displayed in Figure 8.1 as follows: Years is the most important factor in determining Salary, and players with less experience earn lower salaries than more experienced players. Given that a player is less experienced, the number of hits that he made in the previous year seems to play little role in his salary. But among players who have been in the major leagues for five or more years, the number of hits made in the previous year does affect salary, and players who made more hits last year tend to have higher salaries.
+
+
+
+## Initial split into test and non-test sets
+
+```{r}
+set.seed(-203)
+hitters_split <- initial_split(hitters,
+                               # Bumped up the prop to get 132 training observations
+                               prop = 0.505)
+
+hitters_train <- training(hitters_split)
+hitters_test <- testing(hitters_split)
+
+hitters_resamples <- vfold_cv(hitters_train, v = 6)
+```
+
+Then fitting a decision tree with six features 
+
+```{r}
+hitters_train_tree <- tree(
+  salary ~ years + hits + rbi + put_outs + walks + runs,
+  data = hitters_train,
+)
+plot(hitters_train_tree)
+text(hitters_train_tree, digits = 3)
+```
+
+
+Do the same with each CV split:
+
+```{r}
+hitters_resamples_tree <-
+  # Compile all of the analysis data sets from the six splits
+  map_dfr(hitters_resamples$splits, analysis, .id = "split") %>%
+  # For each split...
+  group_by(split) %>%
+  nest() %>%
+  mutate(
+    # ... fit a tree to the analysis set
+    tree_mod = map(
+      data,
+      ~ tree(
+        salary ~ years + hits + rbi + put_outs + walks + runs,
+        data = .x,
+      )
+    )
+  )
+```
+
+Next, we prune the large tree above from 3 terminal nodes down to 1. For this, I’ll vary the best parameter in the prune.tree() function:
+
+```{r}
+hitters_tree_pruned <- 
+  tibble(n_terminal = 1:10) %>%
+  mutate(
+    train_tree_pruned = map(n_terminal,
+                            ~ prune.tree(hitters_train_tree, best = .x)),
+  )
+hitters_tree_pruned
+```
+
+Note that, for  `n_terminal = 1`, the object is singlend, not tree. This makes sense – a single node can’t really be called a tree – but unfortunately it means that I can’t use the predict() function to calculate MSE later on. Mathematically, a single node is just a prediction of the mean of the training set, so I will replace `n_terminal = 1` with a `lm` model with just an intercept:
+
+```{r}
+hitters_tree_pruned <- hitters_tree_pruned %>%
+  mutate(
+    train_tree_pruned = ifelse(
+      n_terminal == 1,
+      list(lm(salary ~ 1, data = hitters_train)),
+      train_tree_pruned
+    )
+  )
+```
+
+Do the same for each CV split:
+
+```{r}
+hitters_resamples_tree_pruned <- hitters_resamples_tree %>%
+  crossing(n_terminal = 1:10) %>%
+  mutate(
+    tree_pruned = map2(tree_mod, n_terminal,
+                       ~ prune.tree(.x, best = .y)),
+    # As above, replace the single node trees with lm
+    tree_pruned = ifelse(
+      n_terminal == 1,
+      map(data, ~ lm(salary ~ 1, data = .x)),
+      tree_pruned
+    )
+  )
+```
+
+Note the warnings. This says some of the models fit to the CV splits had 10 or fewer terminal nodes already, and so no pruning was performed.
+
+Finally, compute the MSE for the different data sets. The training and testing sets:
+```{r}
+# Simple helper function to compute mean squared error
+calc_mse <- function(mod, data) {
+  mean((predict(mod, newdata = data) - data$salary)^2)
+}
+
+hitters_tree_pruned_mse <- hitters_tree_pruned %>%
+  mutate(
+    train_mse = map_dbl(
+      train_tree_pruned,
+      ~ calc_mse(.x, hitters_train)
+    ),
+    test_mse = map_dbl(
+      train_tree_pruned,
+      ~ calc_mse(.x, hitters_test)
+    )
+  )
+hitters_tree_pruned_mse
+```
+
+And the CV splits:
+```{r}
+hitters_resamples_tree_pruned_mse <- hitters_resamples_tree_pruned %>%
+  select(split, n_terminal, tree_pruned) %>%
+  left_join(
+    map_dfr(hitters_resamples$splits, assessment, .id = "split") %>%
+      group_by(split) %>%
+      nest() %>%
+      rename(assessment_data = data),
+    by = "split"
+  ) %>%
+  mutate(
+    cv_mse = map2_dbl(
+      tree_pruned, assessment_data,
+      ~ calc_mse(.x, .y)
+    )
+  ) %>%
+  group_by(n_terminal) %>%
+  summarise(cv_mse = mean(cv_mse), .groups = "drop")
+```
+
+Finally, put it all together (without standard error bars):
+```{r}
+hitters_tree_pruned_mse %>%
+  select(-train_tree_pruned) %>%
+  left_join(hitters_resamples_tree_pruned_mse, by = "n_terminal") %>%
+  pivot_longer(cols = c(train_mse, test_mse, cv_mse), names_to = "data_set") %>%
+  mutate(
+    data_set = factor(data_set,
+                      levels = c("train_mse", "cv_mse", "test_mse"),
+                      labels = c("Training", "Cross-validation", "Test"))
+  ) %>%
+  ggplot(aes(x = n_terminal, y = value, color = data_set)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  scale_y_continuous("Mean squared error", breaks = seq(0, 1.0, 0.2)) +
+  expand_limits(y = c(0, 1.0)) +
+  scale_x_continuous("Tree size", breaks = seq(2, 10, 2)) +
+  scale_color_manual(NULL, values = c("black", "darkgreen", "darkorange")) +
+  theme(legend.position = c(0.7, 0.8))
+```
