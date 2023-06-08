@@ -211,9 +211,10 @@ $k = 1,\ldots,K$:
     
 4. Return the subtree from Step 2 that corresponds to the chosen value of $\alpha$.
 
-## `Baseball` example (regression tree)
+## `Hitters` example (regression tree)
 
-[Workflow: pruning a regression tree](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_regtree.html).
+[Workflow: pruning a regression tree](https://ucla-biostat-200c.github.io/2023spring/slides/16-tree/workflow_regtree.html).
+
 
 ## Classification trees
 
