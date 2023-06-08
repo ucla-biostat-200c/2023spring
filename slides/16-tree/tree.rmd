@@ -22,7 +22,6 @@ Credit: This note heavily uses material from the books [_An Introduction to Stat
 
 Display system information for reproducibility.
 
-## R
 
 ```{r}
 sessionInfo()
@@ -245,9 +244,6 @@ D = - \sum_{k=1}^K \hat p_{mk} \log \hat p_{mk}.
 $$
 It turns out that the Gini index and the cross-entropy are very similar numerically.
 
-## `Heart` data example (classification tree)
-
-[Workflow: pruning a classification tree](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_classtree.html).
 
 ## Tree versus linear models
 
@@ -344,15 +340,6 @@ The test error (black and orange) is shown as a function of $B$, the number of b
 
 Results from random forests for the fifteen-class gene expression data set with $p=500$ predictors. The test error is displayed as a function of the number of trees. Each colored line corresponds to a different value of $m$, the number of predictors available for splitting at each interior tree node. Random forests ($m < p$) lead to a slight improvement over bagging ($m = p$). A single classification tree has an error rate of 45.7\%.
 
-:::
-
-## `Baseball` example (random forest for prediction)
-
-[Workflow: random forest for regression](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_rf_reg.html).
-
-## `Heart` example (random forest for classification)
-
-[Workflow: random forest for classification](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_rf_class.html).
 
 ## Boosting
 
@@ -426,7 +413,7 @@ cross-validation to select $B$.
 
 - Similarly, for bagged/RF classification trees, we add up the total amount that the Gini index is decreased by splits over a given predictor, averaged over all $B$ trees.
 
-::: {#fig-boosting-gene-expression}
+
 
 <p align="center">
 ![](ISL_fig_8_9.pdf){width=500px height=600px}
@@ -434,15 +421,7 @@ cross-validation to select $B$.
 
 Variable importance plot for the `Heart` data.
 
-:::
 
-## Baseball example (boosting for regression)
-
-[Workflow: boosting for regression](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_boosting_reg.html).
-
-## Heart example (boosting for classification)
-
-[Workflow: boosting for classification](https://ucla-econ-425t.github.io/2023winter/slides/08-tree/workflow_boosting_class.html).
 
 ## Summary
 
