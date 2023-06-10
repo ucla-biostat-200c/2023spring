@@ -120,17 +120,17 @@ The researchers had several questions, which they stated to you as follows:
     
     - Plot the change of lengths of the unafflicted part of the nail over time and separated by treatment groups. Comment on overall patterns over time.
 
-    - Based on the pattern observed, pick appropriate time trend in the LMM and provide an algebraic definition for your chosen LMM. Is the linear trend model adequate? or quadratic trend is needed? or any other pattern is more approriate? justify your answer. 
+    - Based on the pattern observed, pick appropriate time trend in the LMM and provide an algebraic definition for your chosen LMM, e.g., is the linear trend model adequate? or quadratic trend is needed? or any other pattern is more approriate? justify your answer. 
     
-    - Fit both random intercept and random slope model and determine which one fits the data better. 
+    - Model the covariance: fit both random intercept and random slope model and determine which one fits the data better. 
 
 2. Use the linear mixed effect model (LMM) to answer: Is there an association between the pattern of change of nail lengths and gender and/or health club frequency in subjects taking terbinafine? This might indicate that this drug brings about relief more swiftly in some kinds of subject versus others. 
 
     - Provide graphs to show patterns the change of nail lengths and gender and/or health club frequency in subjects taking terbinafine. 
     
-    - Based on the pattern observed from question 1, pick appropriate time trend in the LMM and provide an algebraic definition for your chosen LMM. Is the linear trend model adequate? or quadratic trend is needed? or any other pattern is more approriate? justify your answer. 
+    - Based on the pattern observed from question 1, pick appropriate time trend in the LMM and provide an algebraic definition for your chosen LMM, e.g., is the linear trend model adequate? or quadratic trend is needed? or any other pattern is more approriate? justify your answer. 
     
-    - Fit both random intercept and random slope model and determine which one fits the data better. 
+    - Model the covariance: fit both random intercept and random slope model and determine which one fits the data better. 
     
 3. In answering these scientific questions of interest, clearly write out the analytic models you consider for answering these questions (as detailed in the sub-questions). Clearly outline your decision making process for how you selected your final models. Fit your chosen final models and report to the project investigators on the stated scientific questions of interest.
 
