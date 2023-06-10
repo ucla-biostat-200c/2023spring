@@ -359,9 +359,10 @@ display: none;
 <ul>
 <li><a href="#q1.-25-pts-survival-data-analysis" id="toc-q1.-25-pts-survival-data-analysis">Q1. (25 pts) Survival data
 analysis</a></li>
-<li><a href="#q2.-35-pts-longitudinal-data-analysis" id="toc-q2.-35-pts-longitudinal-data-analysis">Q2. (35 pts) Longitudinal
-data analysis</a></li>
-<li><a href="#q3.-40-pts-lmm-and-gamm" id="toc-q3.-40-pts-lmm-and-gamm">Q3. (40 pts) LMM and GAMM</a></li>
+<li><a href="#q2-25-pts.-longitudinal-data-analysis" id="toc-q2-25-pts.-longitudinal-data-analysis">Q2 (25 pts).
+(Longitudinal data analysis)</a></li>
+<li><a href="#q3-25-pts.-gee-and-glmm" id="toc-q3-25-pts.-gee-and-glmm">Q3 (25 pts). (GEE and GLMM)</a></li>
+<li><a href="#q4.-25-pts-lmm-and-gamm" id="toc-q4.-25-pts-lmm-and-gamm">Q4. (25 pts) LMM and GAMM</a></li>
 <li><a href="#optional-extra-credit-problem" id="toc-optional-extra-credit-problem">Optional Extra Credit
 Problem*</a></li>
 </ul>
@@ -694,61 +695,190 @@ can be fit as a generalized linear model with offset.</p></li>
 more flexible models such as Weibull.</p></li>
 </ol>
 </div>
-<div id="q2.-35-pts-longitudinal-data-analysis" class="section level2">
-<h2>Q2. (35 pts) Longitudinal data analysis</h2>
-<p>This question is adapted from Exercise 13.1 of ELMR (p294).</p>
-<p>The <code>ohio</code> data concerns 536 children from Steubenville,
-Ohio and were taken as part of a study on the effects of air pollution.
-Children were in the study for 4 years from ages 7 to 10. The response
-was whether they wheezed (difficulty with breathing) or not. The
-variables are</p>
-<ul>
-<li><p><code>resp</code>: an indicator of wheeze status (1 = yes, 0 =
-no)</p></li>
-<li><p><code>id</code>: an identifier for the child</p></li>
-<li><p><code>age</code>: 7 yrs = -2, 8 yrs = -1, 9 yrs = 0, 10 yrs =
-1</p></li>
-<li><p><code>smoke</code>: an indicator of maternal smoking status at
-the first year of the study (1 = smoker, 0 = non-smoker).</p></li>
-</ul>
+<div id="q2-25-pts.-longitudinal-data-analysis" class="section level2">
+<h2>Q2 (25 pts). (Longitudinal data analysis)</h2>
+<p>Onychomycosis, popularly known as toenail fungus, is a fairly common
+condition that not only can disfigure and sometimes destroy the nail but
+that also can lead to social and self-image issues for sufferers.
+Tight-fitting shoes or hosiery, the sharing of common facilities such as
+showers and locker rooms, and toenail polish are all thought to be
+implicated in the development of onychomycosis. This question relates to
+data from a study conducted by researchers that recruited sufferers of a
+particular type of onychomycosis, dermatophyte onychomycosis. The study
+conducted by the researchers was focused on comparison of two oral
+medications, terbinafine (given as 250 mg/day, denoted as treatment 1
+below) and itraconazole (given as 200 mg/day, denoted as treatment 2
+below).</p>
+<p>The trial was conducted as follows. 200 sufferers of advanced toenail
+dermatophyte onychomycosis in the big toe were recruited, and each saw a
+physician, who removed the afflicted nail. Each subject was then
+randomly assigned to treatment with either terbinafine (treatment 1) or
+itraconazole (treatment 2). Immediately prior to beginning treatment,
+the length of the unafflicted part of the toenail (which was hence not
+removed) was recorded (in millimeters). Then at 1 month, 2 months, 3
+months, 6 months, and 12 months, each subject returned, and the length
+of the unafflicted part of the nail was measured again. A longer
+unafflicted nail length is a better outcome. Also recorded on each
+subject was gender and an indicator of the frequency with which the
+subject visited a gym or health club (and hence might use shared locker
+rooms and/or showers).</p>
+<p>The data are available in the file <code>toenail.txt</code> from <a href="https://ucla.box.com/s/brb3vz4nwoq8pjkcutxncymqw583d39l">here</a>.
+The data are presented in the form of one data record per observation;
+the columns of the data set are as follows:</p>
 <ol style="list-style-type: decimal">
-<li><p>Construct a table that shows proportion of children who wheeze
-for 0, 1, 2, 3 or 4 years broken down by maternal smoking
-status.</p></li>
-<li><p>Make a plot which shows how the proportion of children wheezing
-changes by age with a separate line for smoking and nonsmoking
-mothers.</p></li>
-<li><p>Group the data by child to count the total (out of four) years of
-wheezing. Fit a binomial GLM to this response to check for a maternal
-smoking effect. Does this prove there is a smoking effect or could there
-be another plausible explanation? Discuss the potential issue of using
-GLM here.</p></li>
-<li><p>Fit a model for each individual response using a GLMM fit using
-penalized quasi-likelihood. Interpret the coefficients of age and
-maternal smoking. How do the odds of wheezing change numerically over
-time? Explain what you observe in the output AIC, BIC, and
-logLik.</p></li>
-<li><p>Now fit the same model but using adaptive Gaussian-Hermit
-quadrature (with 25 knots). Compare to the previous model fit. Interpret
-the fixed effect coefficients. Interpret the variance component
-estimates. What is the odds ratio for wheezing comparing a smoking
-mother (<code>smoke = 1</code>) vs a non-smoking mother
-(<code>smoke = 0</code>) and its 95% confidence interval.</p></li>
-<li><p>Fit the model using GEE. Use an autoregressive rather than
-exchangeable error structure. Explain the underlying assumptions of the
-autoregressive correlation structure. Does the GLMM approach in 5
-assumes the same correlation structure within each cluster/individual?
-Compare the results to the previous model fits. In your model, what
-indicates that a child who already wheezes is likely to continue to
-wheeze? What happens if we misspecified the correlation
-structure?</p></li>
-<li><p>What is your overall conclusion regarding the effect of age and
-maternal smoking? Can we trust the GLM result or are the GLMM models
-preferable?</p></li>
+<li><p>Subject id</p></li>
+<li><p>Health club frequency indicator (= 0 if once a week or less, = 1
+if more than once a week)</p></li>
+<li><p>Gender indicator (= 0 if female, = 1 if male)</p></li>
+<li><p>Month</p></li>
+<li><p>Unafflicted nail length (the response, mm)</p></li>
+<li><p>Treatment indicator (= 1 if terbinafine, = 2 if
+itraconazole)</p></li>
+</ol>
+<p>The researchers had several questions, which they stated to you as
+follows:</p>
+<ol style="list-style-type: decimal">
+<li><p>Use the linear mixed effect model (LMM) to answer: Is there a
+difference in the pattern of change of lengths of the unafflicted part
+of the nail between subjects receiving terbinafine and itraconazole over
+a 12 month period? Does one treatment show results more quickly?</p>
+<ul>
+<li><p>Plot the change of lengths of the unafflicted part of the nail
+over time and separated by treatment groups. Comment on overall patterns
+over time.</p></li>
+<li><p>Based on the pattern observed, pick appropriate time trend in the
+LMM and provide an algebraic definition for your chosen LMM. Is the
+linear trend model adequate? or quadratic trend is needed? or any other
+pattern is more approriate? justify your answer.</p></li>
+<li><p>Fit both random intercept and random slope model and determine
+which one fits the data better.</p></li>
+</ul></li>
+<li><p>Use the linear mixed effect model (LMM) to answer: Is there an
+association between the pattern of change of nail lengths and gender
+and/or health club frequency in subjects taking terbinafine? This might
+indicate that this drug brings about relief more swiftly in some kinds
+of subject versus others.</p>
+<ul>
+<li><p>Provide graphs to show patterns the change of nail lengths and
+gender and/or health club frequency in subjects taking
+terbinafine.</p></li>
+<li><p>Based on the pattern observed from question 1, pick appropriate
+time trend in the LMM and provide an algebraic definition for your
+chosen LMM. Is the linear trend model adequate? or quadratic trend is
+needed? or any other pattern is more approriate? justify your
+answer.</p></li>
+<li><p>Fit both random intercept and random slope model and determine
+which one fits the data better.</p></li>
+</ul></li>
+<li><p>In answering these scientific questions of interest, clearly
+write out the analytic models you consider for answering these questions
+(as detailed in the sub-questions). Clearly outline your decision making
+process for how you selected your final models. Fit your chosen final
+models and report to the project investigators on the stated scientific
+questions of interest.</p></li>
 </ol>
 </div>
-<div id="q3.-40-pts-lmm-and-gamm" class="section level2">
-<h2>Q3. (40 pts) LMM and GAMM</h2>
+<div id="q3-25-pts.-gee-and-glmm" class="section level2">
+<h2>Q3 (25 pts). (GEE and GLMM)</h2>
+<p>The Skin Cancer Prevention Study, a randomized, double-blind,
+placebo-controlled clinical trial, was designed to test the
+effectiveness of beta-carotene in the prevention of non-melanoma skin
+cancer in high-risk subjects. A total of 1,683 subjects were randomized
+to either placebo or 50mg of beta-carotene per day and were followed for
+up to 5 years. Subjects were examined once per year and biopsied if a
+cancer was suspected to determine the number of new cancers per year.
+The outcome variable, <span class="math inline">\(Y\)</span>, is a count
+of the number of new skin cancers per year. You may assume that the
+counts of new skin cancers, <span class="math inline">\(Y\)</span>, are
+from exact one-year periods (so that no offset term is needed).</p>
+<p>Selected data from the study are in the dataset called
+<code>skin.txt</code> and is available <a href="https://ucla.box.com/s/brb3vz4nwoq8pjkcutxncymqw583d39l">here</a>.
+Each row of the dataset contains the following 9 variables: ID, Center,
+Age, Skin, Gender, Exposure, <span class="math inline">\(Y\)</span>,
+Treatment, Year. These variables take values as follows:</p>
+<table>
+<colgroup>
+<col width="40%" />
+<col width="59%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ID</strong>:</td>
+<td>Subject identifier number</td>
+</tr>
+<tr class="even">
+<td><strong>Center</strong>:</td>
+<td>Identifier number for center of enrollment</td>
+</tr>
+<tr class="odd">
+<td><strong>Age:</strong></td>
+<td>Subject’s age in years at randomization</td>
+</tr>
+<tr class="even">
+<td><strong>Skin:</strong></td>
+<td>Skin type (1=burns; 0 otherwise) [evaluated at randomization and
+doesn’t change with time]</td>
+</tr>
+<tr class="odd">
+<td><strong>Gender:</strong></td>
+<td>1=male; 0=female</td>
+</tr>
+<tr class="even">
+<td><strong>Exposure:</strong></td>
+<td>Count of number of previous skin cancers [prior to
+randomization]</td>
+</tr>
+<tr class="odd">
+<td><strong><span class="math inline">\(Y\)</span>:</strong></td>
+<td>Count of number of new skin cancers in the Year of follow-up</td>
+</tr>
+<tr class="even">
+<td><strong>Treatment:</strong></td>
+<td>1=beta-carotene; 0=placebo</td>
+</tr>
+<tr class="odd">
+<td><strong>Year:</strong></td>
+<td>Year of follow-up after starting randomized treatment</td>
+</tr>
+</tbody>
+</table>
+<p>Your collaborator is interested in assessing the effect of treatment
+on the incidence of new skin cancers over time. As the statistician on
+the project, provide an analysis of the data that addresses this
+question. Specifically, the investigator at Center=1 is interested in
+characterizing the distribution of risk among subjects at her center. In
+the following, only include the subset of subjects with Center=1 in the
+analysis.</p>
+<ol style="list-style-type: decimal">
+<li><p>Provide an algebraic definition for a generalized linear marginal
+model in which the only effects are for the intercept and Year (as a
+continuous variable). Fit this model and provide a table which includes
+the estimates of the parameters in your model.</p></li>
+<li><p>Provide an algebraic definition for a generalized linear mixed
+model (GLMM) in which the only fixed effects are for the intercept and
+Year (as a continuous variable), and the only random effect is the
+intercept. What is being assumed about how the distribution of risk
+among subjects changes with time?</p></li>
+<li><p>Fit your chosen GLMM and provide a table from your output which
+includes the estimates for the parameters in your GLMM, and provide
+careful interpretation of the Year term.</p></li>
+<li><p>Are the estimates for the fixed intercept terms the same or
+different in the GLMM compared with the marginal model fitted in
+question (1)? Why are they the same or different?</p></li>
+<li><p>Use the parameter estimates from your GLMM and your model
+definition to characterize the distribution of expected counts of new
+skin cancers among subjects at center 1 during their first year of
+follow-up.</p></li>
+</ol>
+</div>
+<div id="q4.-25-pts-lmm-and-gamm" class="section level2">
+<h2>Q4. (25 pts) LMM and GAMM</h2>
 <p>This question is adapted from Exercise 11.2 of ELMR (p251). Read the
 documentation of the dataset <code>hprice</code> in Faraway package
 before working on this problem.</p>
